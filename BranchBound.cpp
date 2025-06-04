@@ -212,6 +212,8 @@ std::vector<Node> generate_children(
         if (batch_id > max_batch_id) max_batch_id = batch_id;
     }
 
+    int child_index = 0;
+
     // 枚举所有非空子集（不剪枝，保持全遍历）
     for (unsigned mask = 1; mask < (1u << n); ++mask) {
         double total_area = 0.0;
@@ -232,7 +234,8 @@ std::vector<Node> generate_children(
 
         auto new_S = node.S;
         new_S[max_batch_id + 1] = std::move(subset);
-        children.emplace_back(std::move(new_S), 0.0, node.name + std::to_string(max_batch_id + 1));
+        std::string child_name = node.name + "_" + std::to_string(child_index++);
+        children.emplace_back(std::move(new_S), 0.0, child_name);
     }
 
     return children;
