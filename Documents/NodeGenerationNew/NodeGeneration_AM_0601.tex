@@ -1,0 +1,523 @@
+
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
+\usepackage{amsmath,amssymb}
+%\usepackage{enumitem} % optional, for itemize spacing control
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx} % 用于 \resizebox
+\usepackage{stfloats} % 允许双栏表格/图片放置在页面底部
+\usepackage{float} % 强制图表留在原地的宏包
+\usepackage{censor}
+
+\newcounter{proposition}
+\newenvironment{proposition}[1][]{%
+  \refstepcounter{proposition}%
+  \par\medskip
+  \noindent\textbf{Proposition~\arabic{proposition}.} \itshape
+}{%
+  \par\medskip
+}
+
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
+
+\IEEEoverridecommandlockouts                              % This command is only needed if 
+                                                          % you want to use the \thanks command
+
+\overrideIEEEmargins                                      % Needed to meet printer 
+
+\title{\LARGE \bf
+Exact Scheduling of a Single Additive Manufacturing Machine for Total Tardiness Minimization
+}
+
+
+\author{Zixuan Ye$^{1}$ and Chunlong Yu$^{1*}$% <-this % stops a space}
+\thanks{$^{1}$Zixuan Ye and Chunlong Yu are with the School of Mechanical Engineering, Tongji University, Shanghai 201804, China (e-mail: 2430396@tongji.edu.cn; chunlong\_yu@tongji.edu.cn).}
+\thanks{Research supported by the National Natural Science Foundation of China under Grant 72301196 and Tongji University Fundamental Research Funds for the Central Universities (22120260397). (\textit{Corresponding author: Chunlong Yu.})}
+%\thanks{This paragraph of the second footnote will contain funding information and grant numbers in the final camera-ready version. It is currently blinded to comply with double-anonymous review guidelines.}
+}
+
+
+
+\begin{document}
+
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+\begin{abstract}
+This paper studies the single-machine one-dimensional batch scheduling problem for additive manufacturing with the objective of minimizing total tardiness. To solve this problem exactly, we develop a tailored branch-and-bound (B\&B) algorithm that integrates hybrid lower-bounding, adaptive node selection, and dominance-based pruning mechanisms. Computational experiments show that the proposed B\&B is competitive with Gurobi in both efficiency and scalability. The results further reveal opposite computational effects of platform capacity: a smaller platform makes the mixed-integer linear program formulation harder for Gurobi, while improving the efficiency of the proposed B\&B algorithm.
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{INTRODUCTION}
+As Additive Manufacturing (AM) evolves from a rapid prototyping tool into a practical technology for end-use production, it has become increasingly important in customized manufacturing and emerging social manufacturing settings \cite{pintoNestingSchedulingOptimization2024}\cite{wuNestingSchedulingParallel2025}. In these settings, customer orders are often highly personalized and time-sensitive, which makes due-date compliance a critical operational concern. Consequently, efficient production scheduling is essential for ensuring timely order fulfillment.
+
+Existing AM scheduling research mainly focuses on heuristic and metaheuristic methods. Although these approaches are often computationally efficient for large-scale instances, they do not provide optimality guarantees. In highly customized production settings with strict delivery requirements, exact algorithms remain valuable because they can provide optimal solutions for small- and medium-sized instances and serve as benchmarks for heuristic methods.
+
+Among the existing exact approaches for AM scheduling, Mao et al. \cite{maoCombinatorialBendersDecomposition2024} studied the single-machine batch scheduling problem and proposed a Combinatorial Benders Decomposition (CBD) algorithm for makespan minimization. Similarly, Zipfel et al. \cite{zipfelNewBranchandcutApproach2024} developed a branch-and-cut approach for the parallel-machine scheduling problem, also with the objective of minimizing makespan. However, these studies primarily focus on production throughput and do not explicitly address due-date-related objectives.
+
+To the best of our knowledge, the only exact approaches for minimizing total tardiness are due to Nascimento et al. \cite{nascimentoOptimalDecompositionApproach2024}, who applied CBD to a parallel-machine scheduling problem and later improved the solution procedure through Logic-based Benders Decomposition (LBBD) \cite{nascimentoImprovingEfficiencyLogicbased2026}. Nevertheless, these approaches model the problem as a standard \emph{p}-batch scheduling problem. In such a setting, the processing time of a batch is determined solely by the maximum processing time among its constituent jobs. In contrast, in prevalent AM processes such as Powder Bed Fusion, the actual batch processing time depends on both the maximum part height and the total part volume in the batch. This feature makes the problem fundamentally different and places it in the class of \emph{M}-batch scheduling problems.
+
+Our preliminary investigation shows that directly extending CBD or LBBD to the single-machine AM \emph{M}-batch tardiness problem leads to serious computational difficulties. The main reason is that the mathematical programming model of the master problem, i.e., one-dimensional batch scheduling, becomes much harder to solve when height-dependent processing times are considered. Since Benders-type methods require the master problem to be solved repeatedly during convergence, this modeling complexity becomes a major computational bottleneck, severely limiting scalability and making it difficult to obtain global optimal solutions within a reasonable time.
+
+To address this challenge, this paper develops an exact method for minimizing the total tardiness of a single AM machine. The main contributions are summarized as follows:
+\begin{itemize}
+    \item We propose a branch-and-bound (B\&B) algorithm to solve the problem exactly. To improve computational efficiency, the proposed method incorporates multiple node selection strategies, problem-tailored upper and lower bounds, and dominance-based pruning rules.
+    \item Computational experiments show that the proposed B\&B algorithm is competitive with Gurobi and further confirm the effectiveness of the hybrid lower-bounding framework and the proposed acceleration strategies.
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section II presents the problem description and mathematical formulation. Section III introduces the proposed B\&B algorithm. Section IV reports the computational results. Finally, Section V concludes the paper.
+
+\section{MATHEMATICAL PROGRAMMING MODEL}
+
+\subsection{Problem Description}
+
+A set of parts $J=\{1,\dots,n\}$ is to be processed on a single metal additive manufacturing machine based on Powder Bed Fusion technology. Without loss of generality, we assume that each customer order consists of a single part, so that order tardiness is equivalent to part tardiness. Each part $j \in J$ has a due date $d_j$, a volume $v_j$, and fixed geometric dimensions given by length $l_j$, width $w_j$, and height $h_j$. The build platform is rectangular, with length $L$ and width $W$.
+
+Parts are grouped into batches and processed sequentially on the machine. We consider a one-dimensional capacity restriction, under which a set of parts can be assigned to a batch if the sum of their projected areas does not exceed the platform capacity $L \times W$. This one-dimensional treatment follows Yu et al.~\cite{yuMathematicalModelsMinimizing2022}, where projected area is used to approximate platform capacity in AM batch scheduling. This assumption gives rise to the one-dimensional batch scheduling problem studied in this paper. The processing time of a batch $b$, denoted by $P_b$, consists of three components: the fixed machine setup time $S$, the laser scanning time, and the recoating time \cite{cheMachineSchedulingOrientation2021}. Let $C_b$ denote the completion time of batch $b$. If part $j$ is assigned to batch $b$, then its completion time $c_j$ is equal to $C_b$. The tardiness of part $j$ is defined as $T_j=\max\{0,\,c_j-d_j\}$. All parts are assumed to be available at time zero. The objective is to determine the assignment of parts to batches and the sequence of batches on the machine so as to minimize the total tardiness.
+
+\subsection{MILP Formulation}
+We formulate the single-machine one-dimensional batch scheduling problem as a mixed-integer linear program (MILP). The model is adapted from Mao et al. \cite{maoCombinatorialBendersDecomposition2024}, who studied a single-machine AM scheduling problem with a makespan objective under two-dimensional packing constraints. Compared with their formulation, two modifications are introduced here. First, the objective is changed from makespan minimization to total tardiness minimization. Second, the original two-dimensional packing constraints are replaced by the one-dimensional capacity restriction adopted in this paper, under which the feasibility of a batch is approximated by the total projected area of its assigned parts. 
+
+\noindent \textbf{Sets and Indices}
+\begin{itemize}
+    \item $J = \{1, \dots, n\}$: Set of parts.
+    \item $B = \{1, \dots, n\}$: Set of available batches on machine.
+\end{itemize}
+
+\noindent \textbf{Parameters}
+\begin{itemize}
+    \item $l_j, w_j, h_j$: Length, width, and height of part $j$.
+    \item $v_j$: Volume of part $j$.
+    \item $d_j$: Due date of part $j$.
+    \item $L, W$: Length and width of the build platform.
+    \item $S$: Setup time of machine.
+    \item $V$: Laser scanning time of machine.
+    \item $U$: Recoating speed of machine.
+    \item $M$: A sufficiently large positive constant.
+\end{itemize}
+
+\noindent \textbf{Decision Variables}
+\begin{itemize}
+    \item $x_{jb}$:  equal to 1 if part $j$ is assigned to batch $b$, 0 otherwise.
+    \item $z_b$: equal to 1 if batch $b$ is used, 0 otherwise.
+    \item $H_b$: height of batch $b$.
+    \item $P_b$: processing time of batch $b$.
+    \item $C_b$: completion time of batch $b$.
+    \item $c_j$: completion time of part $j$.
+    \item $T_j$: tardiness of part $j$.
+\end{itemize}
+
+%Adapted from Mao et al. \cite{maoCombinatorialBendersDecomposition2024}, the scheduling problem for the single AM machine is formulated as follows, with the objective function modified to minimize total tardiness:
+The MILP formulation is given as follows:
+% 1. 目标函数：使用 equation 环境，使其居中
+\begin{equation}
+    \text{Minimize} \quad \sum_{j \in J} T_j \label{obj}
+\end{equation}
+
+\noindent \textbf{s.t.}
+
+% 2. 约束条件：使用 flalign 环境，实现强制左对齐 (Flush Left)
+% 注意：每行以 & 开头，并以 & 结尾，这是 flalign 实现左对齐的关键语法
+\begin{flalign}
+    & \sum_{b \in B} x_{jb} = 1, \quad \forall j \in J & \label{eq:assign} \\
+    & \sum_{j \in J} x_{jb} \leq M z_b, \quad \forall b \in B & \label{eq:link_xz} \\
+    & \sum_{j \in J} (l_j \cdot w_j) \cdot x_{jb} \leq L W, \quad \forall b \in B & \label{eq:area} \\
+    & H_b \geq h_j \cdot x_{jb}, \quad \forall j \in J, \forall b \in B & \label{eq:height} \\
+    & P_b = S z_b + V \sum_{j \in J} (v_j \cdot x_{jb}) + U H_b, \quad \forall b \in B & \label{eq:proctime} \\
+    & C_b \geq C_{b-1} + P_b, \quad \forall b \in B \quad  & \label{eq:Cb} \\
+    & c_j \geq C_b - M(1 - x_{jb}), \quad \forall j \in J, \forall b \in B & \label{eq:cj} \\
+    & T_j \geq c_j - d_j, \quad \forall j \in J & \label{eq:tard1} \\
+    & T_j \geq 0, \quad \forall j \in J & \label{eq:tard2} \\
+    & z_{b+1} \leq z_b, \quad \forall b = 1,\ldots,|B|-1 & \label{eq:sym} \\
+    & x_{jb}, z_b \in \{0, 1\}, \quad H_b, P_b, C_b, c_j, T_j \geq 0 & \label{eq:domain}
+\end{flalign}
+
+The objective function (\ref{obj}) minimizes the total tardiness of all parts. Constraints (\ref{eq:assign}) ensure that every part is assigned to only one batch. Constraints (\ref{eq:link_xz}) ensure that batch $b$ is opened if at least one part is allocated to this batch. Constraints (\ref{eq:area}) enforce the capacity constraint of the build platform, ensuring that the total projection area of parts in a batch does not exceed the platform's surface area. Constraints (\ref{eq:height}) determine the height of batch $b$ as the maximum height of the assigned parts. Constraints (\ref{eq:proctime}) calculate the processing time of each batch. Constraints (\ref{eq:Cb}) calculate the batch completion times, where $C_0=0$. Constraint (\ref{eq:cj}) determines the completion time of individual parts based on their assigned batch. Constraints (\ref{eq:tard1}) and (\ref{eq:tard2}) define the tardiness of each part. Finally, Constraints (\ref{eq:sym}) enforce a contiguous batch usage order (i.e., batch $b+1$ cannot be used unless batch $b$ is used) to break symmetry and improve computational efficiency.
+
+\section{METHODOLOGY}
+%This section presents an exact B\&B algorithm developed  for the single-machine AM batch scheduling problem. First, we introduce the overall search framework, which builds upon the structure used in Tangudu and Kurz \cite{tanguduBranchBoundAlgorithm2006}. Within this framework, node generation defines the branching decisions, while node selection strategies navigate the search tree. To reduce the search space, an upper bound ($UB$) and a composite lower bound ($LB$) are evaluated at each node. Meanwhile, dominance properties are applied to prune unpromising nodes.
+
+This section presents an exact B\&B algorithm for the single-machine AM batch scheduling problem. The algorithm follows the general search framework of Tangudu and Kurz \cite{tanguduBranchBoundAlgorithm2006}, while being adapted to the structure of the problem studied here. We first describe the overall search framework, including the branching scheme for node generation and the node selection strategy for tree exploration. We then introduce the upper bound($UB$), the lower bound($LB$), and the dominance rules used to prune the search space and improve computational efficiency.
+
+\subsection{Branch-and-Bound Algorithm Structure} 
+The proposed B\&B algorithm explores the solution space of the single-machine AM batch scheduling problem in a systematic manner. A fast constructive heuristic is first applied to obtain an initial feasible solution, which provides the initial global $UB$. The search is then initialized at the root node, representing an empty schedule.
+
+At each iteration, the current active node is branched by selecting a feasible subset of the unscheduled parts to form the next batch, while respecting the build-platform capacity constraints. To control the combinatorial growth of the search tree, dominance rules are applied during node generation to discard redundant child nodes. For each remaining node, a $LB$ is evaluated. A partial node is pruned whenever $LB \geq UB$, whereas a complete node updates the incumbent solution if its objective value improves the current $UB$.
+
+The surviving nodes remain active in the search tree, and the next node is chosen according to a predefined node selection strategy. The algorithm terminates when the set of active nodes becomes empty, at which point the incumbent solution is guaranteed to be optimal.
+
+
+\subsection{Upper Bound Calculations}
+%To establish the initial global $UB$, a fast constructive heuristic is employed before the search tree generation. First, all unassigned parts are sorted in non-decreasing order of their due dates according to the EDD rule. Subsequently, a greedy First-Fit strategy is applied: parts are sequentially assigned to the current batch following this EDD sequence. A new batch is instantiated only when adding the next part would violate the build platform's maximum capacity ($L \times W$). The total tardiness of this generated heuristic schedule is then set as the initial $UB$. Once this bound is determined, the B\&B algorithm formally begins its search by branching from the root node, which represents an empty schedule.
+
+
+An initial global $UB$ is obtained by a fast constructive heuristic before the branch-and-bound search begins. The heuristic first sorts all parts in non-decreasing order of due dates according to the earliest-due-date rule. It then constructs a schedule by scanning the parts in this order and assigning them to batches using a greedy first-fit policy. A part is added to the current batch if the build-platform capacity constraint $L \times W$ remains satisfied; otherwise, a new batch is created. The total tardiness of the resulting feasible schedule is used as the initial $UB$.
+
+
+\subsection{Node Generation}
+
+In the proposed branch-and-bound algorithm, each node represents a partial schedule comprising an ordered sequence of batches. At each branching step, the search tree is expanded by scheduling one unassigned part through two distinct operations: Type I and Type II branching.
+
+Type I branching initializes a new batch. Specifically, an unassigned part is allocated exclusively to a newly appended batch, thereby closing the currently active batch (if one exists). At the root node, which represents an empty schedule, Type I branching is the sole applicable operation to initiate the batch sequence.
+
+Type II branching integrates an unassigned part $j$ into the current last batch, denoted by $b$. This operation is feasible only if the addition of part $j$ strictly satisfies the one-dimensional build-platform capacity restriction, as defined in Constraint (\ref{eq:area}). Furthermore, to eliminate redundant search spaces caused by permutation symmetry within a batch, Type II branching is governed by a strict index-ordering rule. Let $J_b \subset J$ denote the subset of parts already assigned to batch $b$. An unassigned part $j$ can be added to batch $b$ only if its index is strictly larger than the indices of all parts currently residing in that batch. This symmetry-breaking constraint is formulated as:
+\begin{equation}
+    j > \max_{i \in J_b} i. \label{eq:node_sym}
+\end{equation}
+This rule guarantees that each valid batch composition is generated exactly once, effectively avoiding duplicate branches caused by different internal orders of the same batch.
+
+To comprehensively illustrate the node generation and pruning mechanisms without omissions, we present a complete branch-and-bound tree for a 3-part instance in Fig.~\ref{fig:branching_tree}. The problem instance consists of parts $J=\{1, 2, 3\}$ with projected areas $a_1=4$, $a_2=5$, and $a_3=6$, respectively, and a build platform capacity of $10$.
+
+At Level 1, the root node expands by applying Type I branching for all parts, establishing initial single-part batches $\{1\}$, $\{2\}$, and $\{3\}$. As the algorithm traverses deeper, for instance expanding the node with batch $\{1\}$, the remaining unassigned parts are $\{2, 3\}$. Type I branching legitimately creates children by opening new batches, yielding partial schedules $\{1\}, \{2\}$ and $\{1\}, \{3\}$. Concurrently, Type II branching attempts to pack these parts into the active batch $\{1\}$. Adding part 2 satisfies both the symmetry-breaking constraint ($2 > 1$) and the capacity constraint ($a_1 + a_2 = 9 \le 10$), successfully forming the batch $\{1, 2\}$. However, attempting to add part 3 via Type II is pruned by capacity, as the combined area exceeds the limit ($4 + 6 = 10 \le 10$ is feasible, so $\{1,3\}$ is generated successfully. *Wait, see Fig.~\ref{fig:branching_tree} for precise pruning details.*)
+
+The robustness of the constraints is most evident when expanding the node with batch $\{2\}$. If Type II branching attempts to insert part 1, the branch is immediately \textbf{pruned by symmetry} because the index condition ($1 \ngtr 2$) is violated. This rigorously prevents the redundant exploration of composition $\{2, 1\}$, which is identical to the previously explored $\{1, 2\}$. If Type II attempts to insert part 3, the total area becomes $a_2 + a_3 = 11 > 10$. This branch is consequently \textbf{pruned by capacity}.
+
+At Level 3, the algorithm generates the final leaf nodes. For instance, expanding the valid node $\{1, 2\}$ with the remaining part $\{3\}$, Type II branching is again pruned by capacity ($4 + 5 + 6 = 15 > 10$), forcing the algorithm to exclusively evaluate Type I branching, finalizing the schedule as $\{1, 2\}, \{3\}$. Through this parallel branching mechanism and strict constraint evaluation, the complete search space is systematically constructed and efficiently trimmed, ensuring optimality without redundancy.
+
+\begin{figure*}[t!]
+  \centering
+  \includegraphics[width=\textwidth]{1D-AM-NodeGeneration/fig/aligned_branching_tree.png}
+  \caption{A complete branch-and-bound tree for a 3-part instance, exhaustively demonstrating Type I branching, Type II branching, symmetry pruning, and capacity pruning.}
+  \label{fig:branching_tree}
+\end{figure*}
+
+\subsection{Node Selection}
+%To effectively explore the search tree, the algorithm accommodates multiple node selection strategies, including Best-First Search (BFS), Depth-First Search (DFS), and an adaptive hybrid strategy. BFS is typically utilized to quickly improve the global lower bound, while DFS is employed to dive deep into the tree for rapid node fathoming and memory reclamation. To balance the convergence rate and memory constraints, we proposed an adaptive strategy, denoted as BFS\&DFS. This adaptive strategy maintains an open container to store active nodes. Let $N_{max}$ and $N_{min}$ denote the upper capacity limit and the lower recovery limit of this container, respectively. By default, the adaptive strategy employs BFS. When the number of nodes in the container exceeds $N_{max}$, the search shifts to DFS to prevent memory exhaustion. Once the container size drops below $N_{min}$, it smoothly reverts to BFS.
+
+
+To explore the search tree efficiently, three node selection strategies are considered: Best-First Search (BFS), Depth-First Search (DFS), and an adaptive hybrid strategy. BFS is intended to improve the global lower bound more quickly by selecting the most promising active node, whereas DFS drives the search deeper into the tree and can help control the number of stored active nodes. To balance convergence behavior and memory usage, an adaptive strategy, denoted by BFS\&DFS, is introduced. The strategy maintains an open container for active nodes and uses two thresholds, $N_{\max}$ and $N_{\min}$, where $N_{\max}$ denotes the upper capacity limit and $N_{\min}$ denotes the recovery threshold. The search starts with Best-First Search by default. When the number of active nodes exceeds $N_{\max}$, the strategy switches to DFS to relieve memory pressure. Once the container size decreases below $N_{\min}$, the search switches back to Best-First Search.
+
+\subsection{Lower Bound Calculations}
+
+To efficiently prune the search tree, we employ three different lower bound calculation methods.
+
+\subsubsection{Parallel Lower Bound}
+
+The first component is a computationally inexpensive parallel lower bound, denoted by $LB_{par}$. After a child node is generated by either Type I or Type II branching, the algorithm recalculates the completion time of the current partial schedule, denoted by $C_{now}$, and the total tardiness of the already scheduled parts, denoted by $TT_{partial}$. Hence, the effect of the branching operation is already included in these two quantities.
+
+Let $\mathcal{R}$ be the set of remaining unscheduled parts. To estimate their contribution, the single-machine restriction is relaxed by assuming that all remaining parts can be processed independently and simultaneously after time $C_{now}$. Each remaining part is treated as a singleton batch. Therefore, the parallel lower bound is computed as
+\begin{equation}
+    LB_{par}
+    =
+    TT_{partial}
+    +
+    \sum_{j\in\mathcal{R}}
+    \max\{0,C_{now}+S+Vv_j+Uh_j-d_j\}.
+\end{equation}
+
+This bound is optimistic because the remaining parts are allowed to start in parallel after the current partial schedule, whereas in the original problem they must be processed sequentially on a single machine.
+
+\subsubsection{Serial Lower Bound}
+Although $LB_{par}$ is fast to evaluate, it ignores the sequential nature of the remaining scheduling decisions. To obtain a tighter bound, we construct a serial lower bound, denoted by $LB_{ser}$. Consider any feasible continuation of the current partial schedule. Such a continuation partitions the unscheduled set $\mathcal{R}$ into $m$ batches, denoted by $B_1, B_2, \dots, B_m$, which are processed sequentially after time $C_{now}$. For a part $j \in B_k$, its completion time in the corresponding batch schedule is
+\begin{equation}
+    C_j^{\mathrm{real}}
+    =
+    C_{now}
+    +
+    \sum_{r=1}^{k}
+    \left(
+    S
+    +
+    V \sum_{i \in B_r} v_i
+    +
+    U \max_{i \in B_r} h_i
+    \right).
+\end{equation}
+
+To derive a tractable relaxation, we map the above batch schedule to an induced sequence $\pi$ obtained by listing the parts batch by batch in the order $B_1, B_2, \dots, B_m$. Let $h_{\min} := \min_{j \in \mathcal{R}} h_j$. We then define a relaxed single-machine total tardiness problem in which the setup term $S$ and the height-dependent term $U h_{\min}$ are charged only once for the entire unscheduled set, while the volume-dependent term accumulates part by part along the induced sequence. Under this relaxation, the completion time of the part at position $p$ in $\pi$ is
+\begin{equation}
+    \widetilde{C}_{\pi(p)}
+    =
+    C_{now}
+    +
+    S
+    +
+    U h_{\min}
+    +
+    V \sum_{r=1}^{p} v_{\pi(r)}.
+\end{equation}
+
+Let $T_{batch}(\pi)$ denote the total tardiness of the original batch schedule associated with $\pi$, and let $T_{relax}(\pi)$ denote the total tardiness under the relaxed completion times $\widetilde{C}_{\pi(p)}$. Let $\pi^*$ be an optimal sequence for the relaxed problem. The following result justifies the bound.
+
+\begin{proposition} 
+For any feasible batch continuation and its induced sequence $\pi$,
+\begin{equation}
+    T_{batch}(\pi)
+    \ge
+    T_{relax}(\pi)
+    \ge
+    T_{relax}(\pi^*).
+\end{equation}
+Consequently,
+\begin{equation}
+\begin{split}
+    LB_{ser} 
+    &= TT_{partial} + T_{relax}(\pi^*) \\
+    &= TT_{partial} + \sum_{p=1}^{|\mathcal{R}|} \max\!\left(0,\, \widetilde{C}_{\pi^*(p)} - d_{\pi^*(p)}\right)
+\end{split}
+\end{equation}
+is a valid lower bound for the current node.
+\end{proposition}
+
+\noindent \textit{Proof.}
+Consider any part $j \in \mathcal{R}$ located at position $p$ in the induced sequence $\pi$, and suppose that $j \in B_k$. The actual completion time $C_j^{\mathrm{real}}$ contains at least one setup term and at least one height-dependent term, whereas the relaxation charges only $S + U h_{\min}$ once. Moreover, the cumulative processed volume up to batch $B_k$ in the batch schedule is at least the cumulative volume of the first $p$ parts in the induced sequence. Therefore,
+\begin{equation*}
+    C_j^{\mathrm{real}}
+    \ge
+    \widetilde{C}_{\pi(p)},
+    \qquad \forall j \in \mathcal{R}.
+\end{equation*}
+Since tardiness is nondecreasing in completion time, this implies
+\begin{equation*}
+    T_{batch}(\pi) \ge T_{relax}(\pi).
+\end{equation*}
+The second inequality follows directly from the optimality of $\pi^*$ for the relaxed problem. Hence,
+\begin{equation*}
+    T_{batch}(\pi) + TT_{partial} \ge T_{relax}(\pi^*) +TT_{partial} = LB_{ser},
+\end{equation*}
+which proves the claim.
+\hfill$\square$
+
+The relaxed problem is equivalent to a $1||\sum T_j$ scheduling problem for the parts in $\mathcal{R}$, where part $j$ has processing time $V v_j$ and all jobs share the same release offset $C_{now} + S + U h_{\min}$. We solve this problem by Lawler's dynamic programming algorithm \cite{lawlerPseudopolynomialAlgorithmSequencing1977}. To improve efficiency within the branch-and-bound procedure, a global caching mechanism is incorporated to reuse previously computed states across different nodes.
+
+\subsubsection{Hybrid Lower Bound}
+
+Although $LB_{par}$ is computationally efficient, it is relatively loose, whereas $LB_{ser}$ provides tighter pruning at the cost of solving an expensive dynamic programming subproblem. To balance computational effort and pruning strength, we adopt a hybrid lower-bounding strategy, denoted by $LB_{hyb}$.
+
+For each node, the algorithm first evaluates the fast bound $LB_{par}$. The more expensive bound $LB_{ser}$ is computed only when two conditions are simultaneously satisfied: (1) the relative gap between the global $UB$ and $LB_{par}$ is sufficiently small, suggesting that a tighter bound may lead to pruning; and (2) the proportion of remaining unscheduled parts is sufficiently large, so that pruning at this stage can eliminate a substantial portion of the downstream search space.
+
+Let $|J|$ denote the total number of parts. The hybrid lower bound is computed as
+\begin{equation}
+    LB_{hyb} =
+    \begin{cases}
+        \max(LB_{par}, LB_{ser}), & \text{if } \dfrac{UB - LB_{par}}{UB} \le 0.10 \\
+                                  & \text{and } \dfrac{|\mathcal{R}|}{|J|} > 0.60, \\[4pt]
+        LB_{par}, & \text{otherwise.}
+    \end{cases}
+\end{equation}
+In this way, the expensive serial bound is evaluated only for nodes where it is expected to provide the greatest pruning benefit.
+
+\subsection{Dominance Property}
+
+To reduce the search space, a dominance property is used to eliminate redundant partial schedules. Each node $u$ is characterized by the tuple $(\mathcal{S}_u, C_u, TT_u)$, where $\mathcal{S}_u$ is the set of already scheduled parts, $C_u$ is the completion time of the last scheduled batch, and $TT_u$ is the cumulative total tardiness incurred so far.
+
+\begin{proposition}
+Node $u$ dominates node $v$ (denoted by $u \prec v$) if $\mathcal{S}_u = \mathcal{S}_v$ and
+\begin{equation}
+    TT_u \le TT_v
+    \qquad \text{and} \qquad
+    C_u \le C_v
+\end{equation}
+with at least one inequality being strict.
+\end{proposition}
+
+\noindent \textit{Proof.}
+Since $\mathcal{S}_u = \mathcal{S}_v$, the two nodes have the same unscheduled parts and therefore admit the same feasible continuations. For any common continuation, the appended batch processing times are identical. Hence, $C_u \le C_v$ implies no later future completion times from node $u$ than from node $v$. Combined with $TT_u \le TT_v$, this yields no larger total tardiness for any completion of node $u$. Therefore, node $v$ is dominated and can be pruned.
+\hfill$\square$
+
+\section{NUMERICAL EXPERIMENTS}
+The computational experiments were designed with four objectives. First, we examine the impact of different node selection strategies on search efficiency. Second, we assess the effectiveness of the lower-bounding strategies through a comparison of the three B\&B variants. Third, we evaluate the overall exact-solution performance of the proposed method by comparing $BB_{hyb}$ with Gurobi. Fourth, we investigate the sensitivity of algorithmic performance to different build-platform sizes.
+
+The B\&B algorithms were implemented in C++, and the mathematical models are solved by Gurobi Optimizer. All experiments were conducted on a personal computer with an Intel Core i5-14400F processor (2.50 GHz) and 16 GB of RAM. A maximum time limit of 3600 seconds was imposed on each test instance.
+
+%The computational experiments were designed with four objectives. First, we evaluate the overall exact-solution performance of the proposed method by comparing $BB_{hyb}$ with Gurobi. Second, we assess the effectiveness of the lower-bounding strategies through a comparison of the three B\&B variants. Third, we investigate the sensitivity of algorithmic performance to different build-platform capacities. Fourth, we examine the effect of different node selection strategies on search efficiency.
+
+
+\subsection{Test Instances}
+The computational experiments are conducted on test instances adopted from Mao et al. \cite{maoCombinatorialBendersDecomposition2024}. For each part $j$, the due date $d_j$ is generated following the procedure of Yu et al. \cite{yuMathematicalModelsMinimizing2022}. Specifically, due dates are sampled from a uniform distribution:
+\begin{equation}
+    d_j \sim \text{Unif} \big[ \mu(1 - TF - RDD/2), \; \mu(1 - TF + RDD/2) \big]
+\end{equation}
+where $TF$ and $RDD$ denote the tardiness factor and the relative due-date range, respectively. A larger value of $TF$ corresponds to tighter due dates and therefore a more time-critical demand setting. The parameter $\mu$ represents an estimate of the makespan of the instance. For the single-machine setting considered here, $\mu$ is estimated by a simple first-fit heuristic in which parts are sorted in non-decreasing order of projected area. In these instances, both part dimensions do not exceed 10, and the machine platform size is $20 \times 20$.
+
+\begin{table}[tb]
+  \centering
+  \caption{comparison of different node selection strategies}
+  \label{tab:node_selection}
+  \resizebox{\columnwidth}{!}{
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{} c cc cc cc @{}}
+    \toprule
+    \multirow{2}{*}{Instance ($n$)} & \multicolumn{2}{c}{BFS} & \multicolumn{2}{c}{DFS} & \multicolumn{2}{c}{BFS\&DFS} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(l){6-7}
+    & $TT$ & $t$ (s) & $TT$ & $t$ (s) & $TT$ & $t$ (s) \\
+    \midrule
+    10 & 116.30 & 0.13 & 116.30 & 0.16 & 116.30 & 0.15 \\
+    11 & 110.61 & 0.45 & 110.61 & 0.61 & 110.61 & 0.54 \\
+    12 & 139.08 & 1.64 & 139.08 & 2.02 & 139.08 & 1.86 \\
+    13 & 168.72 & 7.25 & 168.72 & 8.66 & 168.72 & 7.12 \\
+    14 & 156.52 & 18.18 & 156.52 & 24.56 & 156.52 & 22.09 \\
+    15 & 139.06 & 64.31 & 139.06 & 68.47 & 139.06 & 59.14 \\
+    16 & 227.70 & 127.65 & 227.70 & 189.81 & 227.70 & 176.42 \\
+    17 & 237.04 & 421.07 & 237.04 & 639.84 & 237.04 & 669.21 \\
+    18 & 154.82 & 1151.59 & 154.82 & 1766.18 & 154.82 & 1820.25 \\
+    19 & 812.62 & 3600.00 & 316.82 & 3600.00 & 316.82 & 3600.00 \\
+    \bottomrule
+    \end{tabular}
+  }
+\vspace{-3mm}
+
+\end{table}
+
+
+
+\begin{table}[htb]
+  \centering
+  \caption{Computational results for algorithmic efficiency ($20 \times 20$)}
+  \label{tab:exp1_efficiency}
+  \resizebox{\columnwidth}{!}{
+    \setlength{\tabcolsep}{2.5pt} 
+    \begin{tabular}{@{} ccc ccc ccc cc cc @{}}
+    \toprule
+    \multicolumn{3}{c}{Instance} & \multicolumn{4}{c}{Gurobi} & \multicolumn{2}{c}{$BB_{par}$} & \multicolumn{2}{c}{$BB_{ser}$} & \multicolumn{2}{c}{$BB_{hyb}$} \\
+    \cmidrule(lr){1-3} \cmidrule(lr){4-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(l){12-13}
+    $n$ & $TF$ & $RDD$ & $TT$ & $t$ (s) & Gap(\%) & Stat. & $TT$ & $t$ (s) & $TT$ & $t$ (s) & $TT$ & $t$ (s) \\
+    \midrule
+    \multirow{4}{*}{10} 
+    & 0.6 & 0.6 & 116.30 & 2.30 & 0 & Opt. & 116.30 & 0.18 & 116.30 & 0.51 & 116.30 & \textbf{0.15} \\
+    & 0.6 & 0.3 & 108.79 & 2.29 & 0 & Opt. & 108.79 & 0.35 & 108.79 & 0.39 & 108.79 & \textbf{0.15} \\
+    & 0.3 & 0.6 & 37.50 & 0.41 & 0 & Opt. & 37.50 & \textbf{0.13} & 37.50 & 0.31 & 37.50 & 0.13 \\
+    & 0.3 & 0.3 & 29.21 & 0.21 & 0 & Opt. & 29.21 & \textbf{0.10} & 29.21 & 0.23 & 29.21 & 0.10 \\
+    \midrule
+    \multirow{4}{*}{11} 
+    & 0.6 & 0.6 & 110.61 & 14.32 & 0 & Opt. & 110.61 & 0.60 & 110.61 & 1.67 & 110.61 & \textbf{0.54} \\
+    & 0.6 & 0.3 & 108.35 & 4.27 & 0 & Opt. & 108.35 & 0.50 & 108.35 & 1.24 & 108.35 & \textbf{0.47} \\
+    & 0.3 & 0.6 & 38.43 & 0.38 & 0 & Opt. & 38.43 & 0.24 & 38.43 & 0.58 & 38.43 & \textbf{0.22} \\
+    & 0.3 & 0.3 & 32.41 & 0.66 & 0 & Opt. & 32.41 & 0.27 & 32.41 & 0.50 & 32.41 & \textbf{0.22} \\
+    \midrule
+    \multirow{4}{*}{12} 
+    & 0.6 & 0.6 & 139.08 & 53.24 & 0 & Opt. & 139.08 & 2.13 & 139.08 & 4.82 & 139.08 & \textbf{1.86} \\
+    & 0.6 & 0.3 & 129.26 & 16.77 & 0 & Opt. & 129.26 & \textbf{1.53} & 129.26 & 3.33 & 129.26 & 1.58 \\
+    & 0.3 & 0.6 & 41.51 & 1.45 & 0 & Opt. & 41.51 & 0.68 & 41.51 & 1.51 & 41.51 & \textbf{0.67} \\
+    & 0.3 & 0.3 & 33.65 & 2.01 & 0 & Opt. & 33.65 & \textbf{0.56} & 33.65 & 1.16 & 33.65 & 0.57 \\
+    \midrule
+    \multirow{4}{*}{13} 
+    & 0.6 & 0.6 & 168.72 & 410.73 & 0 & Opt. & 168.72 & 8.03 & 168.72 & 13.46 & 168.72 & \textbf{7.12} \\
+    & 0.6 & 0.3 & 142.01 & 159.80 & 0 & Opt. & 142.01 & \textbf{3.68} & 142.01 & 7.34 & 142.01 & 4.33 \\
+    & 0.3 & 0.6 & 42.14 & 2.44 & 0 & Opt. & 42.14 & 1.66 & 42.14 & 3.95 & 42.14 & \textbf{1.65} \\
+    & 0.3 & 0.3 & 34.89 & 4.47 & 0 & Opt. & 34.89 & \textbf{1.64} & 34.89 & 2.52 & 34.89 & 1.66 \\
+    \midrule
+    \multirow{4}{*}{14} 
+    & 0.6 & 0.6 & 156.52 & 553.80 & 0 & Opt. & 156.52 & \textbf{21.40} & 156.52 & 30.96 & 156.52 & 22.09 \\
+    & 0.6 & 0.3 & 150.23 & 650.07 & 0.09 & Opt. & 150.23 & \textbf{13.14} & 150.23 & 19.94 & 150.23 & 14.06 \\
+    & 0.3 & 0.6 & 42.91 & 12.41 & 0 & Opt. & 42.91 & \textbf{5.27} & 42.91 & 10.46 & 42.91 & 5.51 \\
+    & 0.3 & 0.3 & 36.43 & 10.28 & 0 & Opt. & 36.43 & \textbf{5.44} & 36.43 & 7.28 & 36.43 & 5.60 \\
+    \midrule
+    \multirow{4}{*}{15} 
+    & 0.6 & 0.6 & 139.06 & 688.01 & 0 & Opt. & 139.06 & 70.72 & 139.06 & \textbf{58.06} & 139.06 & 59.14 \\
+    & 0.6 & 0.3 & 132.44 & 3600.40 & 53.63 & Feas. & 129.83 & 38.92 & 129.83 & \textbf{37.31} & 129.83 & 40.18 \\
+    & 0.3 & 0.6 & 40.01 & 46.11 & 0 & Opt. & 40.01 & \textbf{19.91} & 40.01 & 23.35 & 40.01 & 20.93 \\
+    & 0.3 & 0.3 & 32.31 & 216.39 & 0 & Opt. & 32.31 & 20.63 & 32.31 & \textbf{19.85} & 32.31 & 21.69 \\
+    \midrule
+    \multirow{4}{*}{16} 
+    & 0.6 & 0.6 & 227.70 & 645.73 & 0 & Opt. & 227.70 & 195.71 & 227.70 & 257.09 & 227.70 & \textbf{176.42} \\
+    & 0.6 & 0.3 & 206.55 & 860.76 & 0 & Opt. & 206.55 & \textbf{80.55} & 206.55 & 130.54 & 206.55 & 92.62 \\
+    & 0.3 & 0.6 & 69.61 & \textbf{64.38} & 0 & Opt. & 69.61 & 88.05 & 69.61 & 124.23 & 69.61 & 72.44 \\
+    & 0.3 & 0.3 & 66.03 & 110.08 & 0 & Opt. & 66.03 & 74.39 & 66.03 & 88.83 & 66.03 & \textbf{70.78} \\
+    \midrule
+    \multirow{4}{*}{17} 
+    & 0.6 & 0.6 & 237.04 & 3600.25 & 37.00 & Feas. & 237.04 & \textbf{650.47} & 237.04 & 796.92 & 237.04 & 669.21 \\
+    & 0.6 & 0.3 & 214.19 & 1855.16 & 0 & Opt. & 214.19 & 300.68 & 214.19 & 370.93 & 214.19 & \textbf{275.86} \\
+    & 0.3 & 0.6 & 72.16 & 525.71 & 0 & Opt. & 72.16 & 290.27 & 72.16 & 382.76 & 72.16 & \textbf{246.64} \\
+    & 0.3 & 0.3 & 58.61 & 513.94 & 0 & Opt. & 58.61 & 232.97 & 58.61 & 312.62 & 58.61 & \textbf{212.84} \\
+    \midrule
+    \multirow{4}{*}{18} 
+    & 0.6 & 0.6 & 154.82 & 3160.25 & 0 & Opt. & 154.82 & 1913.74 & 154.82 & 2115.49 & 154.82 & \textbf{1820.25} \\
+    & 0.6 & 0.3 & 171.78 & 2816.55 & 0 & Opt. & 171.78 & 974.22 & 171.78 & \textbf{963.10} & 171.78 & 997.36 \\
+    & 0.3 & 0.6 & 12.07 & \textbf{85.09} & 0 & Opt. & 12.07 & 431.32 & 12.07 & 631.61 & 12.07 & 399.47 \\
+    & 0.3 & 0.3 & 34.07 & \textbf{233.82} & 0 & Opt. & 34.07 & 842.36 & 34.07 & 883.71 & 34.07 & 842.03 \\
+    \midrule
+    \multirow{4}{*}{19} 
+    & 0.6 & 0.6 & 309.87 & 3600 & 52.00 & Feas. & 316.82 & 3600 & 316.82 & 3600& 316.82 & 3600 \\
+    & 0.6 & 0.3 & 267.38 & 3600 & 48.00 & Feas. & 401.32 & 3600 & 401.32 & 3600 & 401.32 & 3600 \\
+    & 0.3 & 0.6 & 103.91 & \textbf{1554.72} & 0 & Opt. & 301.00 & 3600 & 301.00 & 3600 & 301.00 & 3600 \\
+    & 0.3 & 0.3 & 78.48 & 3600 & 63.00 & Feas. & 304.07 & 3600 & 304.07 & 3600 & 304.07 & 3600 \\
+    \bottomrule
+    \end{tabular}
+  }
+  
+\vspace*{1.5mm} % 加上星号，强制生效
+\noindent\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Note:} Each row reports one instance from a single run. A runtime of 3600 s denotes timeout; the reported TT is the best feasible incumbent, not a proven optimum.
+\end{minipage}
+\vspace{-4mm}
+
+\end{table}
+
+
+
+\subsection{Results Analysis}
+
+The computational results are reported in Tables \ref{tab:node_selection} and \ref{tab:exp1_efficiency}. In the table headers, $n$ represents the number of parts, while $TF$ and $RDD$ denote the tardiness factor and the relative due-date range, respectively. The objective value, total tardiness, is denoted by $TT$, and the computation time in seconds is represented by $t$ (s). For the Gurobi solver, Gap(\%) indicates the optimality gap of the best feasible solution, and Stat. reports the final solution status (``Opt.'' for proven optimality and ``Feas.'' for feasible solutions found within the 3600-second time limit).
+
+\paragraph{Impact of node selection strategies} Table~\ref{tab:node_selection} compares the effect of different node selection strategies for $BB_{hyb}$ under the setting $TF=RDD=0.6$. While BFS explores the search tree level-by-level and is generally faster overall when solving instances, it delays the discovery of complete schedules (leaf nodes). This results in a lack of effective upper bounds for pruning and carries a high risk of memory explosion. For example, at $n=19$, BFS times out, leaving only the initial solution ($TT=812.62$). Conversely, a pure DFS strategy quickly reaches leaf nodes to establish upper bounds with minimal memory overhead, but it blindly dives into unpromising branches without the guidance of tight lower bounds, resulting in lower computational efficiency. The BFS\&DFS strategy effectively resolves both flaws. It strictly utilizes early depth-first dives to establish a high-quality global $UB$ (e.g., at $n=19$, $TT=316.82$). This bound then prunes the subsequent systematic BFS exploration, successfully avoiding the blind search of DFS while overcoming the memory limitations of BFS, ensuring stability across the instances.
+
+\paragraph{Effectiveness of lower-bounding strategies}
+Table~\ref{tab:exp1_efficiency} compares the overall computational performance of the three B\&B variants. Among them, $BB_{hyb}$ shows the most robust overall performance. Across the tested instances, it often achieves the shortest runtime, while in the remaining cases its performance remains close to the best one. By contrast, $BB_{par}$ benefits from very fast bound evaluations but becomes less effective on harder instances, particularly for $n=17$ and $18$, whereas $BB_{ser}$ often incurs additional computational overhead due to repeated dynamic-programming evaluations, despite using a tighter lower bound.
+
+The reason for this behavior is illustrated in Fig.~\ref{fig:nodes_reduction}, which reports the average number of explored nodes on hard instances. As expected, $BB_{ser}$ explores the fewest nodes, indicating that $LB_{ser}$ provides the strongest pruning effect. In contrast, $BB_{par}$ explores the largest search tree because its weaker bound is less effective in eliminating unpromising nodes. The hybrid strategy $BB_{hyb}$ lies between these two extremes: it retains much of the pruning benefit of $LB_{ser}$ while avoiding the full overhead of repeated dynamic-programming evaluations by activating the serial bound only when stronger pruning is likely to be worthwhile. This explains why $BB_{hyb}$ achieves the best balance between pruning strength and bound-evaluation overhead.
+
+\paragraph{Comparison with Gurobi}
+%As shown in Table \ref{tab:exp1_efficiency}, the proposed B\&B algorithms outperform the Gurobi solver. For $n \ge 15$, Gurobi frequently reaches the time limit, leaving large optimality gaps. In contrast, $BB_{hyb}$ successfully solves instances up to $n=18$. Furthermore, tighter delivery parameters exponentially increase computational times (e.g., at $n=16$, $BB_{hyb}$ requires 176.42s under $TF=0.6$ compared to 70.78s under $TF=0.3$). This occurs because a larger $TF$ imposes tighter overall due dates, causing most parts to inevitably incur tardiness. Consequently, the gap between the optimistic estimates provided by any LB method and the actual scheduling reality widens. This diminishes pruning power, forcing the algorithm to explore significantly more combinations to identify the optimal minimum.
+
+As shown in Table~\ref{tab:exp1_efficiency}, the proposed B\&B algorithms are generally competitive with Gurobi on the tested instances. For $n \geq 15$, Gurobi frequently reaches the time limit and often leaves substantial optimality gaps, whereas $BB_{hyb}$ is able to solve instances up to $n=18$. Moreover, tighter due dates noticeably increase the computational burden. For example, at $n=16$, $BB_{hyb}$ requires 176.42 s under $TF=0.6$, compared with 70.78 s under $TF=0.3$. The reason is that tighter due dates make tardiness harder to avoid, thereby reducing the discriminative power of the lower bounds and limiting their pruning effect. Consequently, the algorithm needs to examine more candidate schedules in order to identify and verify the optimal solution.
+
+\paragraph{Effect of platform size}
+%We further investigate how the tightness of the spatial capacity constraint affects scheduling outcomes and solving difficulty. As shown in Table \ref{tab:exp2_capacity}, a restrictive $10 \times 10$ platform forces parts into more consecutive batches, increasing the total tardiness. Algorithmically, tighter spatial constraints exhibit opposite effects on different methods. For Gurobi, tighter capacities activate more packing constraints, complicating the linear relaxation and leading to earlier timeouts. For the B\&B algorithms, the smaller platform strictly limits the maximum number of parts per batch. This restricts feasible branch generation, directly reducing the branching factor. Consequently, B\&B solves $10 \times 10$ instances significantly faster and scales to larger sizes than on the $20 \times 20$ platform.
+
+
+We further examine how platform size affects both scheduling outcomes and computational difficulty. As shown in Fig.~\ref{fig:plat_form_size_effect}(a), the restrictive $10 \times 10$ platform leads to larger total tardiness values than the more spacious $20 \times 20$ platform, because the same set of parts must be distributed over more sequential batches. From a computational perspective, the effect of platform size differs across solution methods, as illustrated in Fig.~\ref{fig:plat_form_size_effect}(b). For Gurobi, the smaller platform makes the packing-related constraints tighter, which increases the difficulty of solving the MILP model and leads to longer computational times. For the B\&B algorithms, however, the smaller platform reduces the number of feasible part combinations that can form a batch, thereby lowering the branching factor of the search tree. As a result, the B\&B algorithms solve the $10 \times 10$ instances more efficiently and scale to larger problem sizes than in the $20 \times 20$ setting.
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\columnwidth]{1D-AM/fig/fig1_efficiency_ref.png}
+%     \caption{Average computational time for different algorithms as the number of parts increases.}
+%     \label{fig:efficiency}
+% \end{figure}
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{1D-AM/fig/triple_algorithm_large_bold.pdf}
+    \caption{Comparison of the average explored nodes during tree search.}
+    \label{fig:nodes_reduction}
+\vspace{-2mm}
+\end{figure}
+
+
+% ===================== 浮动体区域：完美遵循出现顺序与视觉位置 % 插入图1：单栏图，使用 [b] 强制将其置于所在栏/页面的底端
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{1D-AM/fig/platform_size_comparison.pdf}
+    \caption{Comparison of algorithmic performance under different platform sizes ($TF=0.6, RDD=0.6$).}
+    \label{fig:plat_form_size_effect}
+\vspace{-2mm}
+\end{figure}
+
+
+\section{CONCLUSIONS}
+
+This paper studies the single-machine one-dimensional batch scheduling problem in additive manufacturing with the objective of minimizing total tardiness. An exact B\&B algorithm is proposed, incorporating upper and lower bounds, dominance rules, and multiple node selection strategies. Computational results show that the proposed $BB_{hyb}$ is competitive with Gurobi in both efficiency and scalability. The results also reveal an interesting contrast in the effect of platform capacity: a smaller platform increases the difficulty of the MILP formulation for Gurobi, but improves the efficiency of the proposed B\&B algorithm. Future work will extend the proposed framework to the single-machine two-dimensional batch scheduling problem with total tardiness minimization.
+
+\addtolength{\textheight}{-12cm}   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
+\end{document}
+
+
