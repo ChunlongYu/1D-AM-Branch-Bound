@@ -847,6 +847,27 @@ been evaluated. If $\mathcal{S}_m(N)\in\mathcal{C}$, the stored value
 $\Phi(\mathcal{S}_m(N))$ is directly retrieved. Otherwise, the oracle is
 called, and the computed value is added to the memory pool.
 
+
+\paragraph*{Incremental lower-bound-guarded evaluation.}
+Evaluating $\Phi(\mathcal{S}_m(N))$ for the most heavily loaded machine is by
+far the most expensive oracle call at a leaf. To avoid it whenever possible,
+the machines are evaluated one at a time in nondecreasing order of
+$|\mathcal{S}_m(N)|$ (smallest part set first). Let $\mathcal{E}$ be the set of
+machines already evaluated exactly and
+$\overline{\mathcal{E}}=\mathcal{M}\setminus\mathcal{E}$ the remaining ones.
+Before each oracle call, the algorithm tests the valid running bound
+\[
+\sum_{m\in\mathcal{E}}\Phi\bigl(\mathcal{S}_m(N)\bigr)
++\sum_{m\in\overline{\mathcal{E}}}LB_m\bigl(\mathcal{S}_m(N)\bigr)\;\ge\;UB,
+\]
+where $LB_m(\cdot)$ is the machine-wise lower bound of
+Section~\ref{subsubsec:fast_analytical_lb}. If the inequality holds, the leaf
+cannot improve the incumbent and is pruned immediately, so the remaining
+(typically largest and most costly) oracle calls are skipped. Because the test
+combines exact values for the evaluated machines with valid lower bounds for
+the rest, it never discards an improving leaf; it only avoids provably useless
+exact computations.
+
 Once $Z(N)$ is obtained, it is compared with the current incumbent upper
 bound. If
 \[
@@ -872,7 +893,7 @@ an active node list, denoted by $\mathcal{L}$. The order in which nodes are
 selected from $\mathcal{L}$ affects both the speed of finding high-quality
 incumbent solutions and the efficiency of proving optimality. Therefore,
 the proposed algorithm adopts a hybrid node selection strategy that combines
-depth-first and best-first search.
+a load-balanced diving rule and best-first search.
 
 \subsubsection{Node Selection Strategy}
 
@@ -885,28 +906,33 @@ optimality. However, in the early stage of the search, best-first selection
 may delay the discovery of complete assignments and may therefore provide
 weak incumbent upper bounds.
 
-A depth-first strategy, by contrast, selects one of the deepest active nodes
-in the search tree. Let $d(N)$ denote the depth of node $N$, namely the
-number of parts that have already been assigned. A depth-first node can be
-selected as
+A diving strategy, by contrast, descends quickly toward complete assignments.
+Let $d(N)$ denote the depth of node $N$, namely the number of parts already
+assigned, and let
 \[
-N^*=\arg\max_{N\in\mathcal{L}} d(N).
+\ell(N)=\max_{m\in\mathcal{M}}\bigl|\mathcal{S}_m(N)\bigr|
 \]
-This strategy quickly generates complete assignments and can therefore help
-obtain high-quality upper bounds at an early stage. However, it may also
-spend excessive time exploring unpromising regions of the search tree.
+denote the load of its most heavily loaded machine. Instead of simply
+selecting the deepest node, the algorithm selects the most load-balanced
+active node,
+\[
+N^*=\arg\min_{N\in\mathcal{L}} \ell(N),
+\]
+breaking ties by larger depth $d(N)$. Steering the dive toward balanced
+assignments has two benefits: the resulting complete assignments tend to be
+near-optimal, so the incumbent upper bound is tightened quickly; and every
+machine subset evaluated by the oracle stays small, which keeps the leaf
+evaluations cheap. A purely deepest-node rule, in contrast, tends to pile most
+parts onto a single machine, producing lopsided leaves whose largest oracle
+call is very expensive.
 
-To balance these two effects, we use a hybrid node selection strategy. Although an initial incumbent is available before the search starts, the algorithm first uses depth-first search for a short phase to improve the incumbent quickly. It then switches to best-first search to accelerate the proof of optimality. In addition, two thresholds, $N_{\max}$ and $N_{\min}$,
-are used to control the size of the active node list. If the number of
-active nodes exceeds $N_{\max}$, the algorithm switches to depth-first mode
-to reduce memory consumption. Once the number of active nodes decreases
-below $N_{\min}$, the algorithm switches back to best-first mode.
+To balance these two effects, we use a hybrid node selection strategy. Although an initial incumbent is available before the search starts, the algorithm first uses a balanced diving phase to improve the incumbent quickly. It then switches to best-first search to accelerate the proof of optimality. In addition, two thresholds, $N_{\max}$ and $N_{\min}$, are used to control the size of the active node list. If the number of active nodes exceeds $N_{\max}$, the algorithm switches to the diving mode to reduce memory consumption. Once the number of active nodes decreases below $N_{\min}$, the algorithm switches back to best-first mode.
 
 More specifically, the node selection rule is defined as follows:
 \[
 N^*=
 \begin{cases}
-	\arg\max_{N\in\mathcal{L}} d(N), & \text{if depth-first mode is active},\\[1mm]
+	\arg\min_{N\in\mathcal{L}} \ell(N), & \text{if diving mode is active},\\[1mm]
 	\arg\min_{N\in\mathcal{L}} LB(N), & \text{if best-first mode is active}.
 \end{cases}
 \]
@@ -1420,161 +1446,48 @@ This bound is valid because no feasible continuation can complete part $j$
 before processing at least its own volume and height contribution together
 with one setup operation after time $C_N$.
 
-\subsection{Serial Lower Bound}
+\subsection{Positional Lower Bound}
 
 Although $LB_{\mathrm{par}}(N)$ is inexpensive, it ignores the sequential
-nature of the remaining decisions. A stronger serial lower bound is therefore
-constructed.
+nature of the remaining decisions, since it lets every unscheduled part
+complete as its own singleton batch immediately after $C_N$. A stronger bound
+is obtained by applying the positional argument of
+Appendix~\ref{app:positional_lb} to the unscheduled part set
+$\mathcal{U}(N)$, shifted by the current completion time $C_N$.
 
-Consider an arbitrary feasible continuation from node $N$. Suppose that the
-unscheduled parts are partitioned into batches
-\[
-B_1,B_2,\dots,B_m
-\]
-and these batches are processed sequentially after time $C_N$. For a part
-$j\in B_k$, its actual completion time is
+Let
+$\underline{C}_1\le\underline{C}_2\le\dots\le\underline{C}_{|\mathcal{U}(N)|}$
+be the positional completion-time lower bounds of
+Appendix~\ref{app:positional_lb} computed over the part set $\mathcal{U}(N)$,
+and let
+$d^{\uparrow}_{[1]}\le\dots\le d^{\uparrow}_{[|\mathcal{U}(N)|]}$ be the
+nondecreasing due dates of $\mathcal{U}(N)$. Because every unscheduled part is
+processed after $C_N$, the completion time of the $k$-th completed unscheduled
+part is at least $C_N+\underline{C}_k$. Matching the shifted completion-time
+bounds with the sorted due dates yields the positional lower bound
 \begin{equation}
-	C_j^{\mathrm{real}}
-	=
-	C_N
-	+
-	\sum_{r=1}^{k}
-	\left(
-	S
-	+
-	V\sum_{i\in B_r}v_i
-	+
-	U\max_{i\in B_r}h_i
-	\right).
-	\label{eq:oracle_real_completion}
-\end{equation}
-
-Let $\pi$ be the part sequence induced by listing the parts batch by batch
-according to the order $B_1,B_2,\dots,B_m$. Let
-\begin{equation}
-	h_{\min}
-	=
-	\min_{j\in\mathcal{U}(N)}h_j .
-\end{equation}
-A relaxed completion time for the part at position $p$ in $\pi$ is defined
-as
-\begin{equation}
-	\widetilde{C}_{\pi(p)}
-	=
-	C_N
-	+
-	S
-	+
-	Uh_{\min}
-	+
-	V\sum_{r=1}^{p}v_{\pi(r)} .
-	\label{eq:oracle_relaxed_completion}
-\end{equation}
-This relaxation charges the setup term and the height-dependent term only
-once for all remaining parts, while preserving the cumulative
-volume-dependent contribution along the induced sequence.
-
-For a sequence $\pi$, let
-\begin{equation}
-	T_{\mathrm{relax}}(\pi)
-	=
-	\sum_{p=1}^{|\mathcal{U}(N)|}
-	\max
-	\left\{
-	0,
-	\widetilde{C}_{\pi(p)}-d_{\pi(p)}
-	\right\}.
-\end{equation}
-Let $\pi^*$ be an optimal sequence for the relaxed problem. The serial lower
-bound is then
-\begin{equation}
-	LB_{\mathrm{ser}}(N)
+	LB_{\mathrm{pos}}(N)
 	=
 	TT_N
 	+
-	T_{\mathrm{relax}}(\pi^*).
-	\label{eq:oracle_lb_ser}
+	\sum_{k=1}^{|\mathcal{U}(N)|}
+	\max\bigl\{0,\;C_N+\underline{C}_k-d^{\uparrow}_{[k]}\bigr\}.
+	\label{eq:oracle_lb_pos}
 \end{equation}
+Its validity follows from Proposition~2 of Appendix~\ref{app:positional_lb},
+applied to $\mathcal{U}(N)$, together with the fact that adding the common
+offset $C_N$ to every completion-time bound preserves the inequality.
 
-The relaxed problem is equivalent to a single-machine total tardiness
-problem $1||\sum T_j$ over the unscheduled parts, where part $j$ has
-processing time $Vv_j$ and all parts share the same offset
-$C_N+S+Uh_{\min}$. In the implementation, this relaxed problem is solved
-exactly by a dynamic programming procedure.
+\subsection{Combined Lower Bound}
 
-\begin{proposition}
-	For any node $N$, $LB_{\mathrm{ser}}(N)$ is a valid lower bound on the total
-	tardiness of any complete schedule extending $N$.
-\end{proposition}
-
-\noindent\textit{Proof.}
-Consider any feasible continuation from node $N$ and its induced sequence
-$\pi$. For the part $\pi(p)$, suppose that it belongs to batch $B_k$. Its
-actual completion time in \eqref{eq:oracle_real_completion} includes all
-setup, volume, and height contributions of batches $B_1,\dots,B_k$.
-Therefore, it contains at least one setup term, at least one height-dependent
-term no smaller than $Uh_{\min}$, and a cumulative volume contribution no
-smaller than that of the first $p$ parts in the induced sequence. Hence,
+At each node, both bounds are computed and the larger one is used:
 \begin{equation}
-	C_{\pi(p)}^{\mathrm{real}}
-	\ge
-	\widetilde{C}_{\pi(p)},
-	\qquad
-	p=1,\dots,|\mathcal{U}(N)|.
+	LB(N)=\max\bigl\{LB_{\mathrm{par}}(N),\,LB_{\mathrm{pos}}(N)\bigr\}.
+	\label{eq:oracle_lb}
 \end{equation}
-Since the tardiness function is nondecreasing in completion time, the total
-tardiness of the feasible continuation is no smaller than
-$T_{\mathrm{relax}}(\pi)$. Moreover, $\pi^*$ is optimal for the relaxed
-problem, so
-\begin{equation}
-	T_{\mathrm{relax}}(\pi)
-	\ge
-	T_{\mathrm{relax}}(\pi^*) .
-\end{equation}
-Adding the already fixed tardiness $TT_N$ gives
-\begin{equation}
-	TT_N+T_{\mathrm{batch}}(\pi)
-	\ge
-	TT_N+T_{\mathrm{relax}}(\pi^*)
-	=
-	LB_{\mathrm{ser}}(N).
-\end{equation}
-Thus, $LB_{\mathrm{ser}}(N)$ is a valid lower bound.
-\hfill $\square$
-
-\subsection{Hybrid Lower Bound}
-
-The parallel lower bound is fast but relatively weak, whereas the serial
-lower bound is stronger but more expensive. To balance pruning strength and
-computational effort, a hybrid lower bound is used.
-
-At each node, $LB_{\mathrm{par}}(N)$ is computed first. The serial lower
-bound is evaluated only when the node is close to being pruned and still
-contains a sufficiently large number of unscheduled parts. Specifically, the
-hybrid lower bound is defined as
-\begin{equation}
-	LB_{\mathrm{hyb}}(N)
-	=
-	\begin{cases}
-		\max\{LB_{\mathrm{par}}(N),LB_{\mathrm{ser}}(N)\},
-		& \\
-		\text{if } 
-		\dfrac{UB-LB_{\mathrm{par}}(N)}{UB}\le \theta_1 
-		\text{ and }
-		\dfrac{|\mathcal{U}(N)|}{|\mathcal{Q}|}>\theta_2,
-		\\[3mm]
-		LB_{\mathrm{par}}(N),
-		\text{otherwise},
-	\end{cases}
-	\label{eq:oracle_lb_hyb}
-\end{equation}
-where $\theta_1$ and $\theta_2$ are control parameters. In the computational
-experiments, we set $\theta_1=0.10$ and $\theta_2=0.60$.
-
-Since both $LB_{\mathrm{par}}(N)$ and $LB_{\mathrm{ser}}(N)$ are valid lower
-bounds, their maximum is also valid. When the serial lower bound is not
-activated, $LB_{\mathrm{hyb}}(N)$ reduces to the valid parallel lower bound.
-Therefore, $LB_{\mathrm{hyb}}(N)$ is valid for all nodes.
+Since $LB_{\mathrm{par}}(N)$ and $LB_{\mathrm{pos}}(N)$ are both valid lower
+bounds on the total tardiness of any complete schedule extending $N$, their
+maximum is also valid.
 
 \subsection{Dominance Rule}
 
@@ -1636,7 +1549,7 @@ In best-first search, the selected node has the smallest lower bound:
 	N^*
 	=
 	\arg\min_{N\in\mathcal{L}}
-	LB_{\mathrm{hyb}}(N).
+	LB(N).
 \end{equation}
 
 The adaptive strategy switches between depth-first and best-first search. It
@@ -1662,9 +1575,9 @@ The exact oracle proceeds as follows.
 	\item While $\mathcal{L}$ is not empty, select a node $N$ according to
 	the node selection strategy.
 	
-	\item Compute $LB_{\mathrm{hyb}}(N)$. If
+	\item Compute $LB(N)$. If
 	\[
-	LB_{\mathrm{hyb}}(N)\ge UB,
+	LB(N)\ge UB,
 	\]
 	prune node $N$.
 	

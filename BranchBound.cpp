@@ -1,5 +1,7 @@
 ﻿#include "BranchBound.h"
 #include <algorithm>
+#include <cstdint>
+#include <cmath>
 #include <chrono>
 #include <limits>
 #include <unordered_map>
@@ -252,24 +254,33 @@ double compute_total_lower_bound(
     const std::vector<double>& VT,
     const std::vector<double>& UT,
     const std::vector<double>& h,
-    const std::vector<double>& v
+    const std::vector<double>& v,
+    const std::vector<double>& part_areas,
+    double machine_area
 ) {
     double time_cursor = 0.0;
     double tard_assigned = 0.0;
 
-    // 已分配
+    // 已分配（修复：批次顺序加工，必须按批次编号顺序计算完工时间，
+    // 原实现按 unordered_map 的哈希顺序遍历，会得到与预期不同的加工序列，
+    // 导致下界/叶子目标值错误且依赖输入顺序）
     std::unordered_map<int, double> comp;
     comp.reserve(parts.size());
+    std::vector<int> _bids;
+    _bids.reserve(node.S.size());
     for (typename std::unordered_map<int, std::vector<int> >::const_iterator it = node.S.begin();
-        it != node.S.end(); ++it) {
+        it != node.S.end(); ++it) _bids.push_back(it->first);
+    std::sort(_bids.begin(), _bids.end());
+    for (std::size_t bi = 0; bi < _bids.size(); ++bi) {
+        const std::vector<int>& batch = node.S.at(_bids[bi]);
         double vol = 0.0, mh = 0.0;
-        for (std::size_t j = 0; j < it->second.size(); ++j) {
-            vol += v[it->second[j]];
-            if (h[it->second[j]] > mh) mh = h[it->second[j]];
+        for (std::size_t j = 0; j < batch.size(); ++j) {
+            vol += v[batch[j]];
+            if (h[batch[j]] > mh) mh = h[batch[j]];
         }
         double PT = ST[0] + VT[0] * vol + UT[0] * mh;
-        for (std::size_t j = 0; j < it->second.size(); ++j) {
-            comp[it->second[j]] = time_cursor + PT;
+        for (std::size_t j = 0; j < batch.size(); ++j) {
+            comp[batch[j]] = time_cursor + PT;
         }
         time_cursor += PT;
     }
@@ -277,8 +288,7 @@ double compute_total_lower_bound(
         tard_assigned += std::max(0.0, it->second - D[it->first]);
     }
 
-    // 未分配并行下界
-    double tard_unassigned = 0.0;
+    // 收集未排零件（U(N)）
     std::unordered_set<int> assigned;
     assigned.reserve(parts.size());
     for (typename std::unordered_map<int, std::vector<int> >::const_iterator it = node.S.begin();
@@ -287,17 +297,109 @@ double compute_total_lower_bound(
             assigned.insert(it->second[j]);
         }
     }
+    std::vector<int> U;
+    U.reserve(parts.size());
     for (std::size_t i = 0; i < parts.size(); ++i) {
         int p = parts[i];
-        if (assigned.find(p) == assigned.end()) {
-            double pt = ST[0] + VT[0] * v[p] + UT[0] * h[p];
-            double c = time_cursor + pt;
-            tard_unassigned += std::max(0.0, c - D[p]);
+        if (assigned.find(p) == assigned.end()) U.push_back(p);
+    }
+
+    // 未排零件下界 1：并行下界（每件单独成批，从 time_cursor 开始）
+    double lb_par = 0.0;
+    for (std::size_t i = 0; i < U.size(); ++i) {
+        int p = U[i];
+        double c = time_cursor + ST[0] + VT[0] * v[p] + UT[0] * h[p];
+        lb_par += std::max(0.0, c - D[p]);
+    }
+
+    // 未排零件下界 2：position 下界（论文附录 A，基准时间平移到 time_cursor）
+    double lb_pos = 0.0;
+    const int q = static_cast<int>(U.size());
+    if (q > 0) {
+        std::vector<double> a(q), hh(q), vv(q), dd(q);
+        for (int k = 0; k < q; ++k) {
+            int p = U[k];
+            a[k]  = part_areas[p];
+            hh[k] = h[p];
+            vv[k] = v[p];
+            dd[k] = D[p];
+        }
+        std::sort(a.begin(),  a.end());
+        std::sort(hh.begin(), hh.end());
+        std::sort(vv.begin(), vv.end());
+        std::sort(dd.begin(), dd.end());
+        std::vector<double> hpre(q + 1, 0.0);
+        for (int t = 1; t <= q; ++t) hpre[t] = hpre[t - 1] + hh[t - 1];
+        double Asum = 0.0, Vsum = 0.0;
+        for (int k = 1; k <= q; ++k) {
+            Asum += a[k - 1];
+            Vsum += vv[k - 1];
+            int beta = static_cast<int>(std::ceil(Asum / machine_area - 1e-9));
+            if (beta < 1) beta = 1;
+            if (beta > k) beta = k;
+            double Hk = hpre[beta - 1] + hh[k - 1];
+            double Ck = time_cursor + beta * ST[0] + VT[0] * Vsum + UT[0] * Hk;
+            double td = Ck - dd[k - 1];
+            if (td > 0.0) lb_pos += td;
         }
     }
 
-    return tard_assigned + tard_unassigned;
+    // 综合未排零件下界：取并行界与 position 界的最大值
+    return tard_assigned + std::max(lb_par, lb_pos);
 }
+
+//==================== 节点状态 (C_N, TT_N, 已排集合掩码) ====================
+// 批次按编号顺序加工，与下界函数保持一致。
+static void compute_node_state(
+    const Node& node,
+    const std::vector<double>& D,
+    const std::vector<double>& ST,
+    const std::vector<double>& VT,
+    const std::vector<double>& UT,
+    const std::vector<double>& h,
+    const std::vector<double>& v,
+    double& C_N, double& TT_N, std::uint64_t& sched_mask)
+{
+    double time_cursor = 0.0, tard = 0.0;
+    std::uint64_t mask = 0;
+    std::vector<int> bids;
+    bids.reserve(node.S.size());
+    for (typename std::unordered_map<int, std::vector<int> >::const_iterator it = node.S.begin();
+        it != node.S.end(); ++it) bids.push_back(it->first);
+    std::sort(bids.begin(), bids.end());
+    for (std::size_t bi = 0; bi < bids.size(); ++bi) {
+        const std::vector<int>& batch = node.S.at(bids[bi]);
+        double vol = 0.0, mh = 0.0;
+        for (std::size_t j = 0; j < batch.size(); ++j) {
+            vol += v[batch[j]];
+            if (h[batch[j]] > mh) mh = h[batch[j]];
+        }
+        double PT = ST[0] + VT[0] * vol + UT[0] * mh;
+        time_cursor += PT;
+        for (std::size_t j = 0; j < batch.size(); ++j) {
+            tard += std::max(0.0, time_cursor - D[batch[j]]);
+            mask |= (std::uint64_t(1) << batch[j]);
+        }
+    }
+    C_N = time_cursor; TT_N = tard; sched_mask = mask;
+}
+
+//==================== 自适应节点选择的比较器 ====================
+// best_first=true：最优优先，LB 最小者位于堆顶；
+// best_first=false：深度优先，批次数 |B(N)|=S.size() 最大者位于堆顶。
+struct OracleNodeCmp {
+    const bool* best_first;
+    bool operator()(const Node& a, const Node& b) const {
+        if (*best_first) {
+            if (a.LB != b.LB) return a.LB > b.LB;     // 小 LB 在堆顶
+            return a.S.size() < b.S.size();           // 平手：更深者在堆顶
+        } else {
+            if (a.S.size() != b.S.size())
+                return a.S.size() < b.S.size();        // 大深度在堆顶
+            return a.LB > b.LB;                        // 平手：小 LB 在堆顶
+        }
+    }
+};
 
 
 //========================Branch and Bound（无任何调试输出）========================
@@ -317,7 +419,9 @@ std::pair<Node, Stats> branch_and_cut(
     const std::unordered_map<int, std::vector<int> >& initial_S,
     double UB,
     double time_limit_seconds,
-    const std::string& path
+    const std::string& path,
+    long long node_Nmax,
+    long long node_Nmin
 ) {
     Stats stats;
     double machine_area = L[0] * W[0];
@@ -340,23 +444,83 @@ std::pair<Node, Stats> branch_and_cut(
 
     Node best(initial_S, 0.0, "Best");
     Node root(std::unordered_map<int, std::vector<int> >(), 0.0, "Root");
-    root.LB = compute_total_lower_bound(root, parts, D, ST, VT, UT, h, v);
+    root.LB = compute_total_lower_bound(root, parts, D, ST, VT, UT, h, v, part_areas, machine_area);
 
-    std::deque<Node> stack;
-    stack.push_back(root);
+    // ===== 支配规则：每个“已排零件集合掩码”维护非支配的 (C_N, TT_N) 标签 =====
+    // 论文附录 B：相同已排集合下，若存在 C、TT 都不劣（且至少一个更优）的标签，则被支配可剪。
+    std::unordered_map<std::uint64_t, std::vector<std::pair<double, double> > > dom_labels;
+    const double DEPS = 1e-9;
+    auto dom_dominates = [&](const std::pair<double, double>& a,
+                             const std::pair<double, double>& b) -> bool {
+        // a 支配 b：a.C<=b.C, a.TT<=b.TT，且至少一个严格更小
+        return a.first <= b.first + DEPS && a.second <= b.second + DEPS &&
+               (a.first < b.first - DEPS || a.second < b.second - DEPS);
+    };
+    auto dom_equal = [&](const std::pair<double, double>& a,
+                         const std::pair<double, double>& b) -> bool {
+        return std::abs(a.first - b.first) <= DEPS && std::abs(a.second - b.second) <= DEPS;
+    };
+    // 入栈登记：被支配/重复 -> 返回 false（丢弃）；否则删掉被它支配的旧标签并登记
+    auto dom_register = [&](std::uint64_t m, const std::pair<double, double>& lab) -> bool {
+        std::vector<std::pair<double, double> >& vec = dom_labels[m];
+        for (std::size_t i = 0; i < vec.size(); ++i)
+            if (dom_dominates(vec[i], lab) || dom_equal(vec[i], lab)) return false;
+        vec.erase(std::remove_if(vec.begin(), vec.end(),
+                  [&](const std::pair<double, double>& L){ return dom_dominates(lab, L); }),
+                  vec.end());
+        vec.push_back(lab);
+        return true;
+    };
+    // 出栈复查：是否已被某个（入栈后新增的）更优标签严格支配
+    auto dom_is_dominated = [&](std::uint64_t m, const std::pair<double, double>& lab) -> bool {
+        std::unordered_map<std::uint64_t, std::vector<std::pair<double, double> > >::iterator it = dom_labels.find(m);
+        if (it == dom_labels.end()) return false;
+        for (std::size_t i = 0; i < it->second.size(); ++i)
+            if (dom_dominates(it->second[i], lab)) return true;
+        return false;
+    };
+    dom_register(0ULL, std::make_pair(0.0, 0.0));   // 根节点：空集，(C,TT)=(0,0)
+
+    // 自适应活动列表（二叉堆）：默认最优优先；> N_max 转深度优先，< N_min 转回。
+    bool best_first = true;
+    OracleNodeCmp node_cmp{ &best_first };
+    std::vector<Node> active;
+    active.push_back(root);
+    std::push_heap(active.begin(), active.end(), node_cmp);
 
     auto t0 = std::chrono::steady_clock::now();
 
-    while (!stack.empty()) {
+    while (!active.empty()) {
         auto t1 = std::chrono::steady_clock::now();
         double elapsed = std::chrono::duration<double>(t1 - t0).count();
         if (time_limit_seconds > 0.0 && elapsed > time_limit_seconds) {
             break;
         }
 
-        Node cur = stack.back();
-        stack.pop_back();
+        // 自适应切换（滞回：N_max 进 DFS，N_min 回 best-first）
+        long long asz = static_cast<long long>(active.size());
+        bool want_bf = best_first;
+        if (asz > node_Nmax)      want_bf = false;
+        else if (asz < node_Nmin) want_bf = true;
+        if (want_bf != best_first) {
+            best_first = want_bf;
+            std::make_heap(active.begin(), active.end(), node_cmp);
+        }
+
+        std::pop_heap(active.begin(), active.end(), node_cmp);
+        Node cur = std::move(active.back());
+        active.pop_back();
         ++stats.total_nodes;
+
+        // 出栈时再做一次支配检查（入栈后可能被更优标签支配）
+        {
+            double cC, cTT; std::uint64_t cMask;
+            compute_node_state(cur, D, ST, VT, UT, h, v, cC, cTT, cMask);
+            if (dom_is_dominated(cMask, std::make_pair(cC, cTT))) {
+                ++stats.dom_pruned_nodes;
+                continue;
+            }
+        }
 
         // 初步不可行剪枝
         bool bad = false;
@@ -400,14 +564,20 @@ std::pair<Node, Stats> branch_and_cut(
         std::vector<Node> kids = generate_children(cur, parts, machine_area, part_areas);
         stats.generated_nodes += kids.size();
         for (std::size_t i = 0; i < kids.size(); ++i) {
-            kids[i].LB = compute_total_lower_bound(kids[i], parts, D, ST, VT, UT, h, v);
-            if (kids[i].LB < UB) {
-                stack.push_back(kids[i]);
-                
-            }
-            else {
+            kids[i].LB = compute_total_lower_bound(kids[i], parts, D, ST, VT, UT, h, v, part_areas, machine_area);
+            if (kids[i].LB >= UB) {
                 ++stats.LB_pruned_nodes;
+                continue;
             }
+            // 支配规则：被已有标签支配/重复则丢弃，否则登记并入栈
+            double kC, kTT; std::uint64_t kMask;
+            compute_node_state(kids[i], D, ST, VT, UT, h, v, kC, kTT, kMask);
+            if (!dom_register(kMask, std::make_pair(kC, kTT))) {
+                ++stats.dom_pruned_nodes;
+                continue;
+            }
+            active.push_back(std::move(kids[i]));
+            std::push_heap(active.begin(), active.end(), node_cmp);
         }
     }
 

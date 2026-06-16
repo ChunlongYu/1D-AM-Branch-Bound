@@ -61,6 +61,18 @@ bool readMachineAndParts(
         part_lists.supports.push_back(part.support);
     }
 
+    // Optional due-date section: file ends with the tag "DueDate" followed by num_parts due dates
+    std::string tag;
+    if (file >> tag && tag == "DueDate") {
+        part_lists.due_dates.resize(num_parts);
+        for (int i = 0; i < num_parts; ++i) {
+            if (!(file >> part_lists.due_dates[i])) {
+                part_lists.due_dates.clear();   // incomplete -> treat as absent
+                break;
+            }
+        }
+    }
+
     return true;
 }
 

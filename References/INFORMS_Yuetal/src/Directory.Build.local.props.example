@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <CplexBinDir>C:\IBM\ILOG\CPLEX_Studio128\cplex\bin\x64_win64</CplexBinDir>
+  </PropertyGroup>
+</Project>

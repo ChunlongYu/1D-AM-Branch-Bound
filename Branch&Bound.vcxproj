@@ -132,10 +132,12 @@
     <ClCompile Include="BranchBound.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="InstanceData.cpp" />
+    <ClCompile Include="ParallelBranchBound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BranchBound.h" />
     <ClInclude Include="InstanceData.h" />
+    <ClInclude Include="ParallelBranchBound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

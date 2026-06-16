@@ -6,6 +6,7 @@
 #include <codecvt>
 #include "InstanceData.h"
 #include "BranchBound.h"
+#include "ParallelBranchBound.h"
 
 //-------------含初始解的调用-------------------------
 int main() {
@@ -35,14 +36,13 @@ int main() {
         part_indices.push_back(static_cast<int>(i));
     }
 
-    // 构造截止时间（手动输入）
-    //std::vector<double> due_dates = { 8, 22, 31, 29, 28 }; // 5part
-    //std::vector<double> due_dates = { 9, 23, 32, 30, 29, 7, 13, 8, 20, 29 }; // 10part 0.796s
-    //std::vector<double> due_dates = { 13, 9, 21, 12, 36, 33, 35, 29, 18, 11, 36 }; // 11part 3.612s
-    //std::vector<double> due_dates = { 13, 9, 21, 12, 36, 33, 35, 29, 18, 11, 36, 6 }; // 12part 15.346s
-    //std::vector<double> due_dates = { 13, 9, 21, 12, 36, 33, 35, 29, 18, 11, 36, 6, 29 }; // 13part 133.6s
-    //std::vector<double> due_dates = { 14, 42, 10, 22, 13, 37, 34, 36, 30, 19, 12, 37, 7, 30 }; // 14part
-    std::vector<double> due_dates = { 15, 43, 11, 23, 14, 38, 35, 37, 48, 31, 20, 13, 38, 8, 31 }; // 15part
+    // 截止时间：从实例文件末尾的 DueDate 段读取
+    std::vector<double> due_dates = part_lists.due_dates;
+    if (due_dates.size() != parts.size()) {
+        log_and_cout("Error: instance file has no/incomplete DueDate section (expected "
+            + std::to_string(parts.size()) + " due dates).\n");
+        return 1;
+    }
 
     // 机器尺寸
     std::vector<double> L = { machine.length };
@@ -84,46 +84,65 @@ int main() {
         ST, VT, UT
     );
 
-    log_and_cout("\nTotal Tardiness:" + std::to_string(result.second) + "\n");
+    log_and_cout("\nSingle-machine EDD initial Total Tardiness (info only): "
+        + std::to_string(result.second) + "\n");
 
-    // 构造初始空解（对应新版签名）
-    std::unordered_map<int, std::vector<int>> init_S;
-    // 若有已知不可行批次，用 vector<vector<int>> 填入
-    std::vector<std::set<int>> infeasible_batches;
+    // ================== 并行机分支定界（上层算法）==================
+    // 手动设置并行机器数量 M（论文 METHODOLOGY 的上层搜索树）
+    int M = 2;
 
-    double UB = result.second;
-    double time_limit = 1800.0; // 限制最大搜索时间，单位：秒
-    std::string output_path = "search_log.txt"; // 用于保存搜索日志
+    PBBParams pbb;
+    pbb.M = M;
+    pbb.time_limit = 1800.0;                 // 全局时间限制（秒），<=0 表示不限
+    pbb.strong_branch_candidates = 8;        // strong-branching 候选件数（<=0 全评）
+    pbb.dfs_warmup_improvements = 1;          // 初始深度优先阶段：改进次数阈值
+    pbb.N_max = 200000;                       // 活动节点超过则转深度优先
+    pbb.N_min = 50000;                        // 活动节点低于则转最优优先
 
-    log_and_cout("\n============== Start Branch and Cut Search ==============\n\n");
+    log_and_cout("\n============== Parallel-Machine Branch and Bound ==============\n");
+    log_and_cout("Number of machines M = " + std::to_string(M) + "\n\n");
 
-    // 调用 branch_and_cut（新版签名）
-    std::pair<Node, Stats> bc_result = branch_and_cut(
+    std::pair<PBBSolution, PBBStats> pres = solveParallelMachine(
         part_indices,
         due_dates,
-        infeasible_batches,
         ST, VT, UT,
         L, W,
         part_lists.lengths,
         part_lists.widths,
         part_lists.heights,
         part_lists.volumes,
-        init_S,
-        UB,
-        time_limit,
-        output_path
+        pbb
     );
 
-    log_and_cout("\n=============== Best Solution ===============\n");
-    log_and_cout(bc_result.first);
-    log_and_cout("\n============= The search Info =============\n");
-    log_and_cout("The handled total nodes(pop):" + std::to_string(bc_result.second.total_nodes) + "\n");
-    log_and_cout("The number of generated nodes:" + std::to_string(bc_result.second.generated_nodes) + "\n");
-    log_and_cout("The number of leaf nodes:" + std::to_string(bc_result.second.leaf_nodes) + "\n");
-    log_and_cout("The times of updated best solution:" + std::to_string(bc_result.second.updated_solutions) + "\n");
-    log_and_cout("pruned times-Area:" + std::to_string(bc_result.second.area_pruned_nodes) + "\n");
-    log_and_cout("pruned times-LB:" + std::to_string(bc_result.second.LB_pruned_nodes) + "\n");
-    log_and_cout("pruned times-Infeasible:" + std::to_string(bc_result.second.U_pruned_nodes) + "\n");
+    const PBBSolution& psol = pres.first;
+    const PBBStats& pstats = pres.second;
+
+    log_and_cout("\n=============== Best Parallel Assignment ===============\n");
+    for (int m = 0; m < M; ++m) {
+        std::string line = "  Machine " + std::to_string(m) + " : [";
+        if (m < (int)psol.assign.size()) {
+            for (size_t i = 0; i < psol.assign[m].size(); ++i) {
+                line += std::to_string(psol.assign[m][i]);
+                if (i + 1 != psol.assign[m].size()) line += ", ";
+            }
+        }
+        line += "]  -> Phi = ";
+        line += (m < (int)psol.machine_tardiness.size())
+                    ? std::to_string(psol.machine_tardiness[m]) : "0";
+        log_and_cout(line + "\n");
+    }
+    log_and_cout("\nTotal Tardiness (UB): " + std::to_string(psol.total_tardiness) + "\n");
+    log_and_cout(std::string("Proven optimal: ")
+                 + (psol.proven_optimal ? "yes" : "no (time limit reached)") + "\n");
+
+    log_and_cout("\n============= Parallel Search Info =============\n");
+    log_and_cout("nodes processed:      " + std::to_string(pstats.total_nodes) + "\n");
+    log_and_cout("nodes generated:      " + std::to_string(pstats.generated_nodes) + "\n");
+    log_and_cout("leaf nodes evaluated: " + std::to_string(pstats.leaf_nodes) + "\n");
+    log_and_cout("incumbent updates:    " + std::to_string(pstats.updated_solutions) + "\n");
+    log_and_cout("LB-pruned nodes:      " + std::to_string(pstats.lb_pruned_nodes) + "\n");
+    log_and_cout("oracle calls:         " + std::to_string(pstats.oracle_calls) + "\n");
+    log_and_cout("oracle cache hits:    " + std::to_string(pstats.oracle_cache_hits) + "\n");
 
     double elapsed_seconds = double(std::clock() - start_time) / CLOCKS_PER_SEC;
     log_and_cout("time:" + std::to_string(elapsed_seconds) + "s\n");

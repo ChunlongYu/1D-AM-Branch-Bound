@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="BuildAll" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BuildProject Include="UPMSP - Branch-Cut-and-Price Algorithm.Model\UPMSP_Branch_Cut_and_Price_Algorithm.Model.csproj" />
+    <BuildProject Include="UPMSP - Branch-Cut-and-Price Algorithm.Core\UPMSP_Branch_Cut_and_Price_Algorithm.Core.csproj" />
+    <BuildProject Include="UPMSP - Branch-Cut-and-Price Algorithm\UPMSP_Branch_Cut_and_Price_Algorithm.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildAll">
+    <MSBuild
+      Projects="@(BuildProject)"
+      Targets="Build"
+      Properties="Configuration=$(Configuration);Platform=$(Platform)"
+      BuildInParallel="false"
+      StopOnFirstFailure="true" />
+  </Target>
+
+  <Target Name="CleanAll">
+    <MSBuild
+      Projects="@(BuildProject)"
+      Targets="Clean"
+      Properties="Configuration=$(Configuration);Platform=$(Platform)"
+      BuildInParallel="false"
+      StopOnFirstFailure="true" />
+  </Target>
+</Project>

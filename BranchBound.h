@@ -71,7 +71,9 @@ double compute_total_lower_bound(
     const std::vector<double>& VT,
     const std::vector<double>& UT,
     const std::vector<double>& h,
-    const std::vector<double>& v
+    const std::vector<double>& v,
+    const std::vector<double>& part_areas,
+    double machine_area
 );
 
 //==========================Branch and Bound========================
@@ -83,6 +85,7 @@ struct Stats {
     int LB_pruned_nodes = 0;
     int U_pruned_nodes = 0;
     int leaf_nodes = 0;
+    int dom_pruned_nodes = 0;   // 支配规则剪枝的节点数
 };
 
 std::pair<Node, Stats> branch_and_cut(
@@ -101,7 +104,9 @@ std::pair<Node, Stats> branch_and_cut(
     const std::unordered_map<int, std::vector<int>>& initial_S,
     double UB,
     double time_limit_seconds,
-    const std::string& path
+    const std::string& path,
+    long long node_Nmax = 200000,
+    long long node_Nmin = 50000
 );
 
 //=======================数据记录====================

@@ -1,0 +1,14 @@
+.vs/
+src/.vs/
+
+src/packages/
+
+**/bin/
+**/obj/
+
+*.dll
+*.exe
+*.pdb
+*.vsidx
+*.user
+*.suo

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="Directory.Build.local.props" Condition="Exists('Directory.Build.local.props')" />
+
+  <PropertyGroup>
+    <ProgramFilesX86Dir Condition="'$(ProgramFilesX86Dir)' == '' and '$(MSBuildProgramFiles32)' != ''">$(MSBuildProgramFiles32)</ProgramFilesX86Dir>
+    <ProgramFilesX86Dir Condition="'$(ProgramFilesX86Dir)' == '' and '$(ProgramFiles(x86))' != ''">$(ProgramFiles(x86))</ProgramFilesX86Dir>
+    <ProgramFilesX86Dir Condition="'$(ProgramFilesX86Dir)' == '' and Exists('C:\Program Files (x86)')">C:\Program Files (x86)</ProgramFilesX86Dir>
+    <Net472ReferenceAssemblyDir Condition="'$(Net472ReferenceAssemblyDir)' == '' and '$(ProgramFilesX86Dir)' != ''">$(ProgramFilesX86Dir)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2</Net472ReferenceAssemblyDir>
+    <FrameworkPathOverride Condition="'$(FrameworkPathOverride)' == '' and Exists('$(Net472ReferenceAssemblyDir)\System.Data.dll')">$(Net472ReferenceAssemblyDir)</FrameworkPathOverride>
+    <RepoCplexDebugX64Dir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)UPMSP - Branch-Cut-and-Price Algorithm\bin\x64\Debug'))</RepoCplexDebugX64Dir>
+    <RepoCplexDebugDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)UPMSP - Branch-Cut-and-Price Algorithm\bin\Debug'))</RepoCplexDebugDir>
+    <RepoCplexReleaseX64Dir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)UPMSP - Branch-Cut-and-Price Algorithm\bin\x64\Release'))</RepoCplexReleaseX64Dir>
+    <RepoCplexReleaseDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)UPMSP - Branch-Cut-and-Price Algorithm\bin\Release'))</RepoCplexReleaseDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and '$(CPLEX_BIN_DIR)' != ''">$(CPLEX_BIN_DIR)</CplexBinDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\Softwares\CPLEX 1280\cplex\bin\x64_win64\ILOG.CPLEX.dll')">$(MSBuildThisFileDirectory)..\..\Softwares\CPLEX 1280\cplex\bin\x64_win64</CplexBinDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and Exists('$(RepoCplexDebugX64Dir)\ILOG.CPLEX.dll')">$(RepoCplexDebugX64Dir)</CplexBinDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and Exists('$(RepoCplexDebugDir)\ILOG.CPLEX.dll')">$(RepoCplexDebugDir)</CplexBinDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and Exists('$(RepoCplexReleaseX64Dir)\ILOG.CPLEX.dll')">$(RepoCplexReleaseX64Dir)</CplexBinDir>
+    <CplexBinDir Condition="'$(CplexBinDir)' == '' and Exists('$(RepoCplexReleaseDir)\ILOG.CPLEX.dll')">$(RepoCplexReleaseDir)</CplexBinDir>
+  </PropertyGroup>
+
+  <Target Name="ValidateNetFrameworkReferences"
+          BeforeTargets="ResolveReferences"
+          Condition="'$(TargetFrameworkVersion)' == 'v4.7.2'">
+    <Error Condition="!Exists('$(Net472ReferenceAssemblyDir)\System.Data.dll')"
+           Text=".NET Framework 4.7.2 targeting pack was not found under '$(Net472ReferenceAssemblyDir)'. Install the .NET Framework 4.7.2 Developer Pack or the Visual Studio 2022 '.NET desktop development' / MSBuild components; otherwise framework references such as System.Data cannot be resolved." />
+  </Target>
+
+  <Target Name="ValidateCplexReferences"
+          BeforeTargets="ResolveReferences"
+          Condition="'$(RequiresCplex)' == 'true'">
+    <Error Condition="'$(CplexBinDir)' == ''"
+           Text="CplexBinDir is not set. Set the CPLEX_BIN_DIR environment variable or create Directory.Build.local.props from Directory.Build.local.props.example." />
+    <Error Condition="!Exists('$(CplexBinDir)\ILOG.CPLEX.dll')"
+           Text="ILOG.CPLEX.dll was not found under '$(CplexBinDir)'. Update CplexBinDir in Directory.Build.local.props or the CPLEX_BIN_DIR environment variable." />
+    <Error Condition="!Exists('$(CplexBinDir)\ILOG.Concert.dll')"
+           Text="ILOG.Concert.dll was not found under '$(CplexBinDir)'. Update CplexBinDir in Directory.Build.local.props or the CPLEX_BIN_DIR environment variable." />
+  </Target>
+</Project>
