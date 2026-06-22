@@ -129,15 +129,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BranchBound.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="InstanceData.cpp" />
-    <ClCompile Include="ParallelBranchBound.cpp" />
+    <ClCompile Include="src\BranchBound.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\InstanceData.cpp" />
+    <ClCompile Include="src\ParallelBranchBound.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BranchBound.h" />
-    <ClInclude Include="InstanceData.h" />
-    <ClInclude Include="ParallelBranchBound.h" />
+    <ClInclude Include="src\BranchBound.h" />
+    <ClInclude Include="src\InstanceData.h" />
+    <ClInclude Include="src\ParallelBranchBound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,7 @@
+Re-running big instances  TL=3600s  frontier-cap=25000000 keys 
+=== 19part.txt ===
+RESULT n=19 initUB=602.9 obj=344.072 proven popped=411230679 generated=2936235167 leaves=471 lb_prune=2181607868 dom_prune=343396106 a3_prune=6051499 interch_prune=1516616230 dives=300012 time_s=655.5319 lb=344.072 gap=0.00%
+=== 20part_3-S.txt ===
+RESULT n=20 initUB=462.848 obj=214.067 proven popped=111504793 generated=710778772 leaves=168 lb_prune=496863318 dom_prune=102383777 a3_prune=9499090 interch_prune=530645422 dives=300004 time_s=227.8813 lb=214.067 gap=0.00%
+=== 20part_4-S.txt ===
+RESULT n=20 initUB=367.451 obj=210.129 proven popped=288302509 generated=2201670101 leaves=71 lb_prune=1648467737 dom_prune=264888055 a3_prune=16331130 interch_prune=945469938 dives=300012 time_s=588.7953 lb=210.129 gap=0.00%

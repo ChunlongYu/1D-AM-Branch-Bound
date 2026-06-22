@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="InstanceData.cpp">
+    <ClCompile Include="src\InstanceData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BranchBound.cpp">
+    <ClCompile Include="src\BranchBound.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ParallelBranchBound.cpp">
+    <ClCompile Include="src\ParallelBranchBound.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InstanceData.h">
+    <ClInclude Include="src\InstanceData.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BranchBound.h">
+    <ClInclude Include="src\BranchBound.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ParallelBranchBound.h">
+    <ClInclude Include="src\ParallelBranchBound.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

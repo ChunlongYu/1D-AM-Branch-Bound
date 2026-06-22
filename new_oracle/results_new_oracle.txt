@@ -1,0 +1,33 @@
+new_oracle run  TL=3600s  2026/06/19 ÷‹ŒÂ  9:20:55.83
+=== 10part.txt ===
+RESULT n=10 initUB=310.85 obj=116.3 proven popped=6192 generated=31123 leaves=1 lb_prune=0 dom_prune=14087 a3_prune=1120 interch_prune=8511 dives=0 time_s=0.0100 lb=116.3 gap=0.00%
+=== 10parts_4.txt ===
+RESULT n=10 initUB=172.633 obj=75.7821 proven popped=4082 generated=22860 leaves=1 lb_prune=180 dom_prune=8521 a3_prune=781 interch_prune=6208 dives=0 time_s=0.0082 lb=75.7821 gap=0.00%
+=== 10part_2.txt ===
+RESULT n=10 initUB=277.727 obj=81.7384 proven popped=3150 generated=16855 leaves=4 lb_prune=3029 dom_prune=5291 a3_prune=701 interch_prune=6125 dives=0 time_s=0.0056 lb=81.7384 gap=0.00%
+=== 10part_3.txt ===
+RESULT n=10 initUB=254.892 obj=136.74 proven popped=4005 generated=22994 leaves=2 lb_prune=2265 dom_prune=9701 a3_prune=113 interch_prune=5733 dives=0 time_s=0.0070 lb=136.74 gap=0.00%
+=== 11part.txt ===
+RESULT n=11 initUB=319.12 obj=110.607 proven popped=19264 generated=102493 leaves=1 lb_prune=0 dom_prune=49444 a3_prune=5707 interch_prune=31579 dives=0 time_s=0.0350 lb=110.607 gap=0.00%
+=== 12part.txt ===
+RESULT n=12 initUB=387.353 obj=139.084 proven popped=53626 generated=296226 leaves=1 lb_prune=0 dom_prune=162599 a3_prune=12917 interch_prune=99438 dives=0 time_s=0.1301 lb=139.084 gap=0.00%
+=== 13part.txt ===
+RESULT n=13 initUB=472.401 obj=168.723 proven popped=201741 generated=1133861 leaves=6 lb_prune=377815 dom_prune=415318 a3_prune=20337 interch_prune=464878 dives=150004 time_s=0.4191 lb=168.723 gap=0.00%
+=== 14part.txt ===
+RESULT n=14 initUB=502.683 obj=156.522 proven popped=388614 generated=2295540 leaves=8 lb_prune=1379091 dom_prune=449659 a3_prune=40320 interch_prune=900388 dives=150002 time_s=0.6989 lb=156.522 gap=0.00%
+=== 15part.txt ===
+RESULT n=15 initUB=443.919 obj=139.061 proven popped=577447 generated=3800893 leaves=9 lb_prune=2669948 dom_prune=482721 a3_prune=69790 interch_prune=1373828 dives=150002 time_s=1.0288 lb=139.061 gap=0.00%
+=== 15part_2-S.txt ===
+RESULT n=15 initUB=417.401 obj=118.238 proven popped=834240 generated=5003576 leaves=84 lb_prune=3470712 dom_prune=652851 a3_prune=243218 interch_prune=2434504 dives=150002 time_s=1.2939 lb=118.238 gap=0.00%
+=== 16part.txt ===
+RESULT n=16 initUB=477.947 obj=304.217 proven popped=6327538 generated=45400303 leaves=317 lb_prune=36095577 dom_prune=2961115 a3_prune=173685 interch_prune=14006082 dives=150009 time_s=11.0472 lb=304.217 gap=0.00%
+=== 17part.txt ===
+RESULT n=17 initUB=328.701 obj=206.31 proven popped=7563040 generated=59814196 leaves=233 lb_prune=48529385 dom_prune=3701179 a3_prune=64020 interch_prune=20847705 dives=150005 time_s=13.4680 lb=206.31 gap=0.00%
+=== 18part.txt ===
+RESULT n=18 initUB=451.35 obj=232.734 proven popped=29150450 generated=226223513 leaves=891 lb_prune=173828977 dom_prune=23229068 a3_prune=672171 interch_prune=82545172 dives=150007 time_s=56.1853 lb=232.734 gap=0.00%
+=== 19part.txt ===
+=== 20part_3-S.txt ===
+RESULT n=20 initUB=462.848 obj=214.067 proven popped=111264911 generated=709118090 leaves=168 lb_prune=495469754 dom_prune=102356541 a3_prune=9456709 interch_prune=529240686 dives=300007 time_s=217.7035 lb=214.067 gap=0.00%
+=== 20part_4-S.txt ===
+=== 5part.txt ===
+RESULT n=5 initUB=71.6268 obj=40.5691 proven popped=26 generated=85 leaves=1 lb_prune=8 dom_prune=9 a3_prune=17 interch_prune=0 dives=0 time_s=0.0001 lb=40.5691 gap=0.00%
