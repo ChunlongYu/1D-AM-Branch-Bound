@@ -18,59 +18,74 @@
 \newlabel{eq:pm_domain}{{13}{2}}
 \newlabel{eq}{{14}{2}}
 \@writefile{toc}{\contentsline {section}{\numberline {II}METHODOLOGY}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-A}Overall Branch-and-Bound Framework}{2}{}\protected@file@percent }
-\newlabel{subsec:overall_framework}{{II-A}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-B}Assignment-Based Search Tree}{3}{}\protected@file@percent }
-\newlabel{subsec:assignment_tree}{{II-B}{3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-B.1}Node Representation}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-B.2}Symmetry-Reduced Branching Scheme}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-B.3}Branching Part Selection}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-C}Node Lower Bound}{4}{}\protected@file@percent }
-\newlabel{subsec:node_lb}{{II-C}{4}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.1}Machine-Wise Monotonicity Bound}{4}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.2}Memory-Based Lower Bound}{4}{}\protected@file@percent }
-\newlabel{subsubsec:fast_analytical_lb}{{II-C.3}{5}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.3}Fast Analytical Lower Bound}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.4}Unassigned-Part Relaxation}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-D}Upper Bound and Complete Assignment Evaluation}{5}{}\protected@file@percent }
-\newlabel{subsec:ub_complete_eval}{{II-D}{5}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.1}Initial Upper Bound}{6}{}\protected@file@percent }
-\newlabel{subsubsec:ls_refine}{{II-D.2}{6}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.2}Local-Search Refinement}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.3}Complete Assignment Evaluation}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-E}Node Selection and Pruning}{7}{}\protected@file@percent }
-\newlabel{subsec:node_selection_pruning}{{II-E}{7}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.1}Node Selection Strategy}{7}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.2}Pruning Rules}{7}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.3}Optimality Guarantee}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-A}Design Rationale: Assignment-Based Branching versus Branch-and-Price}{2}{}\protected@file@percent }
+\newlabel{subsec:design_rationale}{{II-A}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-B}Overall Branch-and-Bound Framework}{3}{}\protected@file@percent }
+\newlabel{subsec:overall_framework}{{II-B}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-C}Assignment-Based Search Tree}{3}{}\protected@file@percent }
+\newlabel{subsec:assignment_tree}{{II-C}{3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.1}Node Representation}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.2}Symmetry-Reduced Branching Scheme}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-C.3}Branching Part Selection}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-D}Node Lower Bound}{4}{}\protected@file@percent }
+\newlabel{subsec:node_lb}{{II-D}{4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.1}Machine-Wise Monotonicity Bound}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.2}Memory-Based Lower Bound}{5}{}\protected@file@percent }
+\newlabel{subsubsec:fast_analytical_lb}{{II-D.3}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.3}Fast Analytical Lower Bound}{5}{}\protected@file@percent }
+\newlabel{subsubsec:heavy}{{II-D.4}{6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.4}Heavy-Machine Oracle Bound}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-D.5}Unassigned-Part Relaxation}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-E}Upper Bound and Complete Assignment Evaluation}{6}{}\protected@file@percent }
+\newlabel{subsec:ub_complete_eval}{{II-E}{6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.1}Initial Upper Bound}{6}{}\protected@file@percent }
+\newlabel{subsubsec:ls_refine}{{II-E.2}{7}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.2}Local-Search Refinement}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-E.3}Complete Assignment Evaluation}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-F}Node Selection and Pruning}{7}{}\protected@file@percent }
+\newlabel{subsec:node_selection_pruning}{{II-F}{7}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-F.1}Node Selection Strategy}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-F.2}Pruning Rules}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {II-F.3}Optimality Guarantee}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {II-G}Exact Single-Machine Scheduling Oracle}{8}{}\protected@file@percent }
+\newlabel{subsec:single_machine_oracle}{{II-G}{8}}
 \citation{maoCombinatorialBendersDecomposition2024}
 \citation{yuMathematicalModelsMinimizing2022}
-\@writefile{toc}{\contentsline {subsection}{\numberline {II-F}Exact Single-Machine Scheduling Oracle}{8}{}\protected@file@percent }
-\newlabel{subsec:single_machine_oracle}{{II-F}{8}}
-\@writefile{toc}{\contentsline {section}{\numberline {III}Test Instances}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Single-machine oracle on benchmark instances. ``Popped'' is the number of expanded nodes; all instances are proven optimal.}}{8}{}\protected@file@percent }
-\newlabel{tab:single}{{I}{8}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Computational Results}{8}{}\protected@file@percent }
-\newlabel{sec:results}{{IV}{8}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {IV-A}Single-Machine Oracle}{8}{}\protected@file@percent }
-\newlabel{subsec:res_single}{{IV-A}{8}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {IV-B}Effect of the Local-Search Upper Bound}{8}{}\protected@file@percent }
-\newlabel{subsec:res_ls}{{IV-B}{8}}
+\@writefile{toc}{\contentsline {section}{\numberline {III}Test Instances}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Computational Results}{9}{}\protected@file@percent }
+\newlabel{sec:results}{{IV}{9}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces MILP solve effort under Gurobi for the idealized p-batch model versus our mix-batch model (same instances, $\bar  M=2$, $60$\,s limit). Both are proven optimal except $^\dagger $, which hits the time limit.}}{9}{}\protected@file@percent }
+\newlabel{tab:milp}{{I}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-A}MILP Tractability: mix-batch versus idealized p-batch}{9}{}\protected@file@percent }
+\newlabel{subsec:res_milp}{{IV-A}{9}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-machine oracle on benchmark instances. ``Popped'' is the number of expanded nodes; all instances are proven optimal.}}{10}{}\protected@file@percent }
+\newlabel{tab:single}{{II}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-B}Single-Machine Oracle}{10}{}\protected@file@percent }
+\newlabel{subsec:res_single}{{IV-B}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-C}Effect of the Diving Rule}{10}{}\protected@file@percent }
+\newlabel{subsec:res_dive}{{IV-C}{10}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Diving rule: generated nodes and peak active-list size. Both rules return the same optimum; $^\dagger $ marks runs that did not prove optimality within a $30$--$35$\,s limit (the depth-first dive proves all five).}}{10}{}\protected@file@percent }
+\newlabel{tab:dive}{{III}{10}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Local-search refinement under the depth-first dive (generated nodes). Both configurations return the same optimum.}}{10}{}\protected@file@percent }
+\newlabel{tab:ls}{{IV}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-D}Effect of the Local-Search Upper Bound}{10}{}\protected@file@percent }
+\newlabel{subsec:res_ls}{{IV-D}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-E}A Negative Result on Free-Part Bounds}{10}{}\protected@file@percent }
+\newlabel{subsec:res_freepar}{{IV-E}{10}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Heavy-machine oracle bound on loose-due-date instances ($\bar  M=3$, $30$\,s limit). ``big calls'' counts exact oracle evaluations on subsets of $\ge 12$ parts. $^\ddagger $ the disabled-bound incumbent is suboptimal.}}{11}{}\protected@file@percent }
+\newlabel{tab:heavy}{{V}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-F}Pruning Heavily Unbalanced Assignments}{11}{}\protected@file@percent }
+\newlabel{subsec:res_heavy}{{IV-F}{11}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Scaling of the single-machine oracle. The gap is $(\text  {obj}-\text  {lb})/\text  {obj}$; $n\le 17$ are proven optimal.}}{11}{}\protected@file@percent }
+\newlabel{tab:scale}{{VI}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {IV-G}Scaling Behavior}{11}{}\protected@file@percent }
+\newlabel{subsec:res_scaling}{{IV-G}{11}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}CONCLUSIONS}{11}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{reference}
 \bibcite{pintoNestingSchedulingOptimization2024}{1}
 \bibcite{wuNestingSchedulingParallel2025}{2}
 \bibcite{maoCombinatorialBendersDecomposition2024}{3}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Local-search upper bound on the parallel-machine search. Nodes are generated nodes; both configurations return the same optimum.}}{9}{}\protected@file@percent }
-\newlabel{tab:ls}{{II}{9}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {IV-C}A Negative Result on Free-Part Bounds}{9}{}\protected@file@percent }
-\newlabel{subsec:res_freepar}{{IV-C}{9}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {IV-D}Scaling Behavior}{9}{}\protected@file@percent }
-\newlabel{subsec:res_scaling}{{IV-D}{9}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Scaling of the single-machine oracle. The gap is $(\text  {obj}-\text  {lb})/\text  {obj}$; $n\le 17$ are proven optimal.}}{9}{}\protected@file@percent }
-\newlabel{tab:scale}{{III}{9}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}CONCLUSIONS}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{9}{}\protected@file@percent }
 \bibcite{zipfelNewBranchandcutApproach2024}{4}
 \bibcite{nascimentoOptimalDecompositionApproach2024}{5}
 \bibcite{nascimentoImprovingEfficiencyLogicbased2026}{6}
@@ -78,23 +93,24 @@
 \bibcite{tanguduBranchBoundAlgorithm2006}{8}
 \bibcite{lawlerPseudopolynomialAlgorithmSequencing1977}{9}
 \bibcite{yuMathematicalModelsMinimizing2022}{10}
-\@writefile{toc}{\contentsline {section}{Appendix}{10}{}\protected@file@percent }
-\newlabel{app:positional_lb}{{}{10}}
-\@writefile{toc}{\contentsline {section}{Appendix}{11}{}\protected@file@percent }
-\newlabel{app:single_machine_oracle}{{}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A}Single-Machine Subproblem}{11}{}\protected@file@percent }
-\newlabel{eq:oracle_batch_processing_time}{{19}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B}Node Representation}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {C}Branching Rule}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {D}Initial Upper Bound}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {E}Parallel Lower Bound}{12}{}\protected@file@percent }
-\newlabel{eq:oracle_lb_par}{{31}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {F}Positional Lower Bound}{12}{}\protected@file@percent }
-\newlabel{eq:oracle_lb_pos}{{32}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {G}Combined Lower Bound}{12}{}\protected@file@percent }
-\newlabel{eq:oracle_lb}{{33}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {H}Dominance Rule}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {I}Node Selection}{13}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {J}Overall Procedure}{13}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {K}Optimality Guarantee}{13}{}\protected@file@percent }
-\gdef \@abspage@last{13}
+\@writefile{toc}{\contentsline {section}{References}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Appendix}{12}{}\protected@file@percent }
+\newlabel{app:positional_lb}{{}{12}}
+\@writefile{toc}{\contentsline {section}{Appendix}{13}{}\protected@file@percent }
+\newlabel{app:single_machine_oracle}{{}{13}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A}Single-Machine Subproblem}{13}{}\protected@file@percent }
+\newlabel{eq:oracle_batch_processing_time}{{19}{13}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B}Node Representation}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {C}Branching Rule}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {D}Initial Upper Bound}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {E}Parallel Lower Bound}{14}{}\protected@file@percent }
+\newlabel{eq:oracle_lb_par}{{31}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {F}Positional Lower Bound}{14}{}\protected@file@percent }
+\newlabel{eq:oracle_lb_pos}{{32}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {G}Combined Lower Bound}{14}{}\protected@file@percent }
+\newlabel{eq:oracle_lb}{{33}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {H}Dominance Rule}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {I}Node Selection}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {J}Overall Procedure}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {K}Optimality Guarantee}{15}{}\protected@file@percent }
+\gdef \@abspage@last{15}

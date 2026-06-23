@@ -1,10 +1,18 @@
 #include "ParallelBranchBound.h"
+#include <string>
 #include "BranchBound.h"
 #include <cstdlib>
 #include "../new_oracle/phi_oracle.h"
 
 static bool      g_useFreePar    = false;   // parallel positional free-part bound on/off (env FREEPAR)
 static double    g_freeGate      = 0.5;    // compute it only when |free|>=gate*n  (env FREEGATE)
+// Heavy-machine strong bound (env HEAVY=1, default on): a machine carrying >= K parts
+// gets a strong LB from a small-budget run of the single-machine oracle (>> lbPos).
+// K = ceil(n/M)+margin, cap = n^2 oracle nodes -- both auto-scaled, no tuning.
+static int       g_heavyK        = 0;      // 0 = off; set in solveParallelMachine
+static long long g_heavyCap      = 0;      // oracle node budget for the heavy LB
+static long long g_heavyPrunes   = 0, g_heavyCalls = 0;
+static std::unordered_map<uint64_t,double> g_heavyCache;
 static long long g_freeParPrunes = 0;      // how many nodes it pruned (diagnostic)   // solvePhi() = the new strong single-machine oracle     // generateInitialSolution(), branch_and_cut() -> oracle Phi
 
 #include <algorithm>
@@ -253,6 +261,28 @@ double machineLB(const Ctx& ctx, const std::vector<int>& Q, uint64_t qmask) {
     return std::max(fast, mem);
 }
 
+// Strong lower bound for a HEAVY machine (>=K parts): run the single-machine
+// oracle with a small node budget and take its PROVEN lower bound (much stronger
+// than lbPos, which collapses to ~0 on large congested sets). Any valid LB keeps
+// correctness; memoized per part-set mask.
+double heavyLB(const Ctx& ctx, const std::vector<int>& Q, uint64_t qmask) {
+    if (g_heavyK <= 0 || (int)Q.size() < g_heavyK) return 0.0;
+    auto it = g_heavyCache.find(qmask);
+    if (it != g_heavyCache.end()) return it->second;
+    LocalInstance li = makeLocal(ctx, Q);
+    int k = (int)li.parts.size();
+    std::vector<double> area(k);
+    for (int i = 0; i < k; ++i) area[i] = li.l[i]*li.w[i];
+    bool proven = true; double lb = 0.0;
+    solvePhi(k, li.v, li.h, area, li.D,
+             (*ctx.ST)[0], (*ctx.VT)[0], (*ctx.UT)[0], (*ctx.L)[0]*(*ctx.Wv)[0],
+             0.0, &proven, 200000, 50000, true, true, 0.0, 0.5, 25000000ULL,
+             &lb, g_heavyCap);
+    ++g_heavyCalls;
+    g_heavyCache.emplace(qmask, lb);
+    return lb;
+}
+
 // ===========================================================================
 //  Node helpers.
 // ===========================================================================
@@ -324,8 +354,20 @@ int selectBranchingPart(const Ctx& ctx, const PNode& nd,
 
     int    bestPart  = U.front();
     double bestScore = -1.0;
+    // Branching score (env SCORE): spread(default)=max-min of child-LB gains;
+    // min=worst-child gain (classic strong-branching style); prod=product; sum=total.
+    // See docs: spread wins on M=2 / small M=3, min wins on larger M>=3. Default = spread.
+    static int SCOREMODE = -1;
+    if (SCOREMODE < 0) {
+        SCOREMODE = 0;
+        if (const char* e = getenv("SCORE")) {
+            std::string m = e;
+            if (m=="min") SCOREMODE=1; else if (m=="prod") SCOREMODE=2;
+            else if (m=="sum") SCOREMODE=3; else SCOREMODE=0;
+        }
+    }
     for (int j : cand) {
-        double vmax = -INF, vmin = INF;
+        double vmax = -INF, vmin = INF, vsum = 0.0, vprod = 1.0;
         for (int r : K) {
             std::vector<int> Qr = nd.assign[r];
             Qr.push_back(j);
@@ -333,8 +375,13 @@ int selectBranchingPart(const Ctx& ctx, const PNode& nd,
             double val = g - curMLB[r];          // marginal increase on machine r
             if (val > vmax) vmax = val;
             if (val < vmin) vmin = val;
+            vsum += val; vprod *= (val + 1e-6);
         }
-        double score = vmax - vmin;
+        double score;
+        if      (SCOREMODE==1) score = vmin;        // worst-child gain
+        else if (SCOREMODE==2) score = vprod;       // product of gains
+        else if (SCOREMODE==3) score = vsum;        // total gain
+        else                   score = vmax - vmin; // spread (default)
         // tie-break: prefer earlier due date
         if (score > bestScore + 1e-12 ||
             (std::abs(score - bestScore) <= 1e-12 &&
@@ -605,6 +652,11 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
 
     std::vector<PNode> active;
     active.push_back(root);
+    // Diving rule: default is a genuine depth-first dive (deepest node first,
+    // ties broken by the most balanced node). Set DIVE=load to restore the old
+    // min-load rule for comparison. Node order never affects correctness.
+    bool diveLoad = false;
+    if (const char* e = getenv("DIVE")) diveLoad = (std::string(e) == "load");
 
     // ---- hybrid node-selection state --------------------------------------
     bool warmupDone   = (params.dfs_warmup_improvements <= 0);
@@ -613,6 +665,14 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
 
     if (const char* e = getenv("FREEPAR"))  g_useFreePar = (atoi(e) != 0);
     if (const char* e = getenv("FREEGATE")) g_freeGate   = atof(e);
+    // heavy-machine strong bound: default ON; HEAVY=0 disables.  Auto K and cap.
+    { bool on=true; if(const char* e=getenv("HEAVY")) on=(atoi(e)!=0);
+      int margin=4; if(const char* e=getenv("HEAVYMARGIN")) margin=atoi(e);
+      if(on){ g_heavyK = (ctx.n + ctx.M - 1)/ctx.M + margin; g_heavyCap = (long long)ctx.n*ctx.n; }
+      else  { g_heavyK = 0; } }
+    if (const char* e = getenv("HEAVYLB"))  g_heavyK  = atoi(e);   // explicit K override
+    if (const char* e = getenv("HEAVYCAP")) g_heavyCap= atoll(e);  // explicit cap override
+    g_heavyPrunes=0; g_heavyCalls=0; g_heavyCache.clear();
     g_freeParPrunes = 0;
 
     // ---- main loop ---------------------------------------------------------
@@ -636,14 +696,28 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
         // select node index
         int sel = 0;
         if (dfsMode) {
-            // 实验：均衡优先 —— 负载 = 各机器件数的最大值，越小越均衡；
-            // 主键最均衡，平手取更深，引导搜索先到均衡叶子。
+            // load = number of parts on the most heavily loaded machine (smaller = more balanced)
             auto maxLoad = [&](const PNode& nd){ size_t mx=0; for (auto& a : nd.assign) mx=std::max(mx,a.size()); return (int)mx; };
-            int bestLoad = maxLoad(active[0]); int bestDepth = active[0].depth;
-            for (int i = 1; i < (int)active.size(); ++i) {
-                int ld = maxLoad(active[i]);
-                if (ld < bestLoad || (ld==bestLoad && active[i].depth > bestDepth)) {
-                    bestLoad = ld; bestDepth = active[i].depth; sel = i;
+            if (!diveLoad) {
+                // DEFAULT depth-first dive: deepest node first, tie broken by the most
+                // balanced node. Descends to a balanced complete assignment in O(n) pops
+                // (fast, near-optimal incumbent) and, being a true DFS, keeps the active
+                // node list bounded.
+                int bestDepth = active[0].depth; int bestLoad = maxLoad(active[0]);
+                for (int i = 1; i < (int)active.size(); ++i) {
+                    int dp = active[i].depth; int ld = maxLoad(active[i]);
+                    if (dp > bestDepth || (dp==bestDepth && ld < bestLoad)) {
+                        bestDepth = dp; bestLoad = ld; sel = i;
+                    }
+                }
+            } else {
+                // legacy min-load rule (DIVE=load)
+                int bestLoad = maxLoad(active[0]); int bestDepth = active[0].depth;
+                for (int i = 1; i < (int)active.size(); ++i) {
+                    int ld = maxLoad(active[i]);
+                    if (ld < bestLoad || (ld==bestLoad && active[i].depth > bestDepth)) {
+                        bestLoad = ld; bestDepth = active[i].depth; sel = i;
+                    }
                 }
             }
         } else {
@@ -689,6 +763,21 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
         std::vector<double> curMLB; double curUnassigned;
         double baseLB = nodeLB(ctx, cur, curMLB, curUnassigned);
 
+        // strong heavy-machine prune: lift a heavy machine's LB via small oracle run
+        if (g_heavyK > 0) {
+            bool cut=false;
+            for (int m=0;m<ctx.M;++m){
+                if ((int)cur.assign[m].size() >= g_heavyK){
+                    double hb = heavyLB(ctx, cur.assign[m], cur.mask[m]);
+                    if (hb > curMLB[m] + 1e-12){
+                        double strongLB = baseLB - curMLB[m] + hb;
+                        if (strongLB >= UB - 1e-9){ cut=true; break; }
+                    }
+                }
+            }
+            if (cut){ ++stats.lb_pruned_nodes; ++g_heavyPrunes; continue; }
+        }
+
         // ---- stronger free-part bound (parallel positional), gated to shallow nodes ----
         if (g_useFreePar && (int)U.size() >= g_freeGate * ctx.n) {
             double fp = freeParallelLB(ctx, U, ctx.M);
@@ -722,6 +811,7 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
 
     // ---- assemble result ---------------------------------------------------
     if (g_useFreePar) fprintf(stderr, "[freepar] gate=%.2f prunes=%lld\n", g_freeGate, g_freeParPrunes);
+    if (g_heavyK>0) fprintf(stderr, "[heavy] K=%d cap=%lld calls=%lld prunes=%lld\n", g_heavyK, g_heavyCap, g_heavyCalls, g_heavyPrunes);
     sol.assign            = bestAssign;
     sol.machine_tardiness = bestPerMachine;
     sol.total_tardiness   = UB;

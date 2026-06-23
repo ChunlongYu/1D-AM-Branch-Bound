@@ -74,9 +74,9 @@ avoid recomputation and strengthen the node bound. The incumbent upper bound is
 produced by a multi-rule constructive heuristic refined by a move-based local
 search. Computational experiments show that the algorithm proves optimality for
 instances with up to $17$ parts within seconds on the single machine, and that
-on the parallel-machine problem the local-search upper bound accelerates the
-search by up to two orders of magnitude when the number of machines is three or
-more, while leaving the proven optimum unchanged. We further report a negative
+on the parallel-machine problem a corrected depth-first diving rule reduces both
+the search-tree size and the peak memory by up to several orders of magnitude
+relative to a balance-first rule, while leaving the proven optimum unchanged. We further report a negative
 result: a parallel positional free-part bound is structurally dominated by the
 per-part floor and yields no additional pruning.
 \end{abstract}
@@ -224,6 +224,55 @@ Because the machines are identical, the model also contains symmetry across mach
 Constraint \eqref{eq} imposes a nonincreasing order on the number of used batch positions across machines. In other words, machine (m+1) cannot use more batch positions than machine (m). Since the machines are identical, this restriction does not exclude any structurally distinct feasible schedule, but it helps reduce redundant symmetric solutions and can improve the tractability of the MILP.
 
 \section{METHODOLOGY}
+
+\subsection{Design Rationale: Assignment-Based Branching versus Branch-and-Price}
+\label{subsec:design_rationale}
+
+Two families of exact methods dominate the parallel-machine scheduling
+literature for min-sum objectives. The first is \emph{assignment-based}
+(bin-packing-style) branch-and-bound: the search branches on the assignment of
+jobs to machines, and once an assignment is fixed the problem separates into
+independent single-machine subproblems. The second is \emph{branch-and-price}
+(Dantzig--Wolfe / column generation), in which the master problem is a
+set-partitioning model whose columns are complete single-machine schedules and
+the pricing subproblem is a single-machine problem; this approach yields the
+strongest known relaxations and is the de facto state of the art for total
+(weighted) completion-time and tardiness objectives on parallel machines.
+% TODO: cite a canonical parallel-machine branch-and-price / column-generation
+% reference (e.g., set-partitioning by machine schedules) and a representative
+% assignment/bin-packing branch-and-bound reference.
+
+We deliberately adopt the assignment-based framework, and the choice is dictated
+by the structure of the single-machine subproblem in our setting. In classical
+parallel-machine problems the per-machine subproblem is polynomially solvable
+(e.g., WSPT for total weighted completion time, or EDD-type rules), so the
+per-machine evaluation at a leaf is closed-form. In the one-dimensional AM batch
+scheduling problem, by contrast, the single-machine subproblem is itself
+NP-hard: it couples an area-feasible (knapsack-type) batching decision with a
+sequencing decision and a batch processing time that depends nonlinearly on the
+total volume and the maximum height of the parts in each batch. We therefore
+embed an \emph{exact single-machine oracle} at each leaf and memoize its values
+across the search tree (Section~\ref{subsec:single_machine_oracle}), yielding a
+\emph{nested} exact branch-and-bound in which the leaf evaluation is itself an
+exact search. This nested, oracle-driven evaluation is the main structural
+difference between our method and a textbook assignment-based branch-and-bound,
+whose leaves are evaluated in closed form.
+
+The same hardness explains why we do not pursue branch-and-price here. In a
+column-generation formulation the pricing subproblem would be exactly this
+NP-hard, time-coupled prize-collecting batch-scheduling problem on a single
+machine; pricing would therefore be at least as hard as the oracle we already
+solve, and considerably more expensive per node. The assignment-based framework
+instead confines the hard sub-structure to an independent, memoizable
+single-machine oracle and exposes a cleanly separable node bound
+(Section~\ref{subsec:node_lb}). Its two classical weaknesses---symmetry among
+identical machines, and weak lower bounds at shallow nodes where many parts are
+still unassigned---are addressed directly by the symmetry-reduced branching of
+Section~\ref{subsec:assignment_tree} and the free-part bounds of
+Section~\ref{subsec:node_lb}, respectively. Closing the residual shallow-node gap
+is precisely where a column-generation bound would help, and we leave that
+heavier route to future work.
+
 \subsection{Overall Branch-and-Bound Framework}
 \label{subsec:overall_framework}
 
@@ -697,9 +746,13 @@ LB_m(\mathcal{Q}_m(N))
 \left\{
 LB_m^{\mathrm{mem}}(\mathcal{Q}_m(N)),
 \;
-LB_m^{\mathrm{fast}}(\mathcal{Q}_m(N))
-\right\}.
+LB_m^{\mathrm{fast}}(\mathcal{Q}_m(N)),
+\;
+LB_m^{\mathrm{heavy}}(\mathcal{Q}_m(N))
+\right\},
 \]
+where the heavy-machine term $LB_m^{\mathrm{heavy}}$ is defined in
+Section~\ref{subsubsec:heavy} and is zero on lightly loaded machines.
 Therefore, the assigned-part lower bound of node $N$ is
 \[
 LB^{\mathrm{ass}}(N)
@@ -707,6 +760,35 @@ LB^{\mathrm{ass}}(N)
 \sum_{m\in\mathcal{M}}
 LB_m(\mathcal{Q}_m(N)).
 \]
+
+\subsubsection{Heavy-Machine Oracle Bound}
+\label{subsubsec:heavy}
+
+The analytical bound $LB_m^{\mathrm{fast}}$ rests on a positional argument that
+pairs sorted positional completions with sorted due dates. On a heavily loaded
+machine---one carrying many parts---this pairing is very loose and can collapse
+to zero even when the true single-machine tardiness $\Phi$ is large, because it
+optimistically assigns the tight-due-date parts to the earliest positions, a
+configuration a congested machine cannot realize. Such heavily loaded machines
+occur only in extremely unbalanced complete assignments, which are almost never
+optimal; yet without a tight bound the search descends into these subtrees and
+pays the full cost of an exact oracle evaluation on a large part set.
+
+To prune these subtrees, we compute a stronger machine-wise bound whenever a
+machine is heavily loaded. Concretely, when
+$|\mathcal{Q}_m(N)|\ge K$ with $K=\lceil n/\bar M\rceil+4$ (a load exceeding the
+balanced load $\lceil n/\bar M\rceil$ by a fixed margin), we run the
+single-machine oracle on $\mathcal{Q}_m(N)$ with a small budget of $n^2$
+expanded nodes and take its \emph{proven} lower bound
+$LB_m^{\mathrm{heavy}}(\mathcal{Q}_m(N))$, namely the minimum node bound over its
+unexplored frontier when the budget is reached (the exact $\Phi$ if it finishes
+first). Since any valid lower bound preserves correctness, this only tightens the
+node bound; it is memoized per part set, and is set to zero on machines below the
+threshold. Both the threshold $K$ and the budget $n^2$ scale automatically with
+the instance, so no manual tuning is required. On a $20$-part instance this bound
+lifts heavily loaded machines whose positional bound is essentially zero to their
+true tardiness of $20$--$30$, well above the incumbent, pruning the
+corresponding subtrees before any large oracle call.
 
 \subsubsection{Unassigned-Part Relaxation}
 
@@ -966,19 +1048,24 @@ assigned, and let
 \[
 \ell(N)=\max_{m\in\mathcal{M}}\bigl|\mathcal{S}_m(N)\bigr|
 \]
-denote the load of its most heavily loaded machine. Instead of simply
-selecting the deepest node, the algorithm selects the most load-balanced
-active node,
+denote the load of its most heavily loaded machine. the algorithm selects the deepest active node and breaks ties toward the most
+balanced one,
 \[
-N^*=\arg\min_{N\in\mathcal{L}} \ell(N),
+N^*=\arg\max_{N\in\mathcal{L}} d(N),
+\qquad\text{ties broken by }\arg\min_{N}\ell(N).
 \]
-breaking ties by larger depth $d(N)$. Steering the dive toward balanced
-assignments has two benefits: the resulting complete assignments tend to be
-near-optimal, so the incumbent upper bound is tightened quickly; and every
-machine subset evaluated by the oracle stays small, which keeps the leaf
-evaluations cheap. A purely deepest-node rule, in contrast, tends to pile most
-parts onto a single machine, producing lopsided leaves whose largest oracle
-call is very expensive.
+Because each branching step assigns one more part, always expanding a deepest
+node descends to a complete assignment in $O(n)$ selections, so a feasible
+incumbent is obtained quickly. The tie-break toward the most balanced node keeps
+the leaf reached along the dive balanced, so its complete assignment tends to be
+near-optimal and every machine subset evaluated by the oracle stays small, which
+keeps the leaf evaluations cheap. Being a genuine depth-first descent, the dive
+expands one node and enqueues only its children, so the active node list stays
+bounded; this is what makes the diving mode effective for controlling memory. A
+rule that instead prioritizes the most balanced node over depth does not descend:
+it sweeps the frontier by load level and lets the active list grow, which we
+found ineffective both for obtaining incumbents and for bounding memory
+(Section~\ref{subsec:res_dive}).
 
 To balance these two effects, we use a hybrid node selection strategy. Although an initial incumbent is available before the search starts, the algorithm first uses a balanced diving phase to improve the incumbent quickly. It then switches to best-first search to accelerate the proof of optimality. In addition, two thresholds, $N_{\max}$ and $N_{\min}$, are used to control the size of the active node list. If the number of active nodes exceeds $N_{\max}$, the algorithm switches to the diving mode to reduce memory consumption. Once the number of active nodes decreases below $N_{\min}$, the algorithm switches back to best-first mode.
 
@@ -986,14 +1073,11 @@ More specifically, the node selection rule is defined as follows:
 \[
 N^*=
 \begin{cases}
-	\arg\min_{N\in\mathcal{L}} \ell(N), & \text{if diving mode is active},\\[1mm]
+	\arg\max_{N\in\mathcal{L}} d(N), & \text{if diving mode is active},\\[1mm]
 	\arg\min_{N\in\mathcal{L}} LB(N), & \text{if best-first mode is active}.
 \end{cases}
 \]
-When multiple nodes have the same selection priority, ties are broken by
-choosing the node with the larger depth. This tie-breaking rule encourages
-the search to reach complete assignments earlier, while still following the
-main priority rule.
+In best-first mode, ties in $LB(N)$ are broken by larger depth; in diving mode, ties in depth are broken by selecting the most balanced node, i.e.\ the one with the smallest $\ell(N)$. Both tie-breaks steer the search toward complete, balanced assignments.
 
 \subsubsection{Pruning Rules}
 
@@ -1113,6 +1197,75 @@ uses the strong oracle as $\Phi$, the local-search upper bound of
 Section~\ref{subsubsec:ls_refine}, and the memoization pool. Reported objective
 values are total tardiness.
 
+\subsection{MILP Tractability: mix-batch versus idealized p-batch}
+\label{subsec:res_milp}
+
+We first quantify why a tailored exact method is needed at all, by measuring how
+the batch processing-time structure affects the difficulty of solving the problem
+with a general-purpose MILP solver (Gurobi). We use a single position-indexed
+MILP and toggle \emph{only} the batch processing-time definition, holding the
+instances, machine count, due dates, area capacity, objective, and solver
+settings fixed. Two models are compared: our realistic \emph{mix-batch} model,
+$P(B)=S+V\sum_{j\in B}v_j+U\max_{j\in B}h_j$, in which the laser-scan component is
+serial (additive in volume) while recoating is parallel (governed by the maximum
+height); and the idealized \emph{p-batch} (parallel-batch) model used in prior AM
+scheduling work, $P(B)=S+\max_{j\in B}(V v_j+U h_j)$, in which the longest single
+job governs the whole batch.
+% TODO: cite Nascimento et al. (2024), EJOR, for the p-batch AM model.
+The two models coincide on singleton batches and differ only in how multi-part
+batches accumulate: a \emph{sum} of volumes (serial) versus a \emph{max}
+(parallel). All runs use $\bar M=2$ and a $60$\,s time limit.
+
+\begin{table}[t]
+\centering
+\caption{MILP solve effort under Gurobi for the idealized p-batch model versus
+our mix-batch model (same instances, $\bar M=2$, $60$\,s limit). Both are
+proven optimal except $^\dagger$, which hits the time limit.}
+\label{tab:milp}
+\small
+\begin{tabular}{l r r r r r r}
+\toprule
+\multirow{2}{*}{Instance} & \multirow{2}{*}{$n$}
+ & \multicolumn{2}{c}{p-batch} & \multicolumn{2}{c}{mix-batch} & \multirow{2}{*}{$\frac{t_{\text{mix}}}{t_{\text{pb}}}$} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ & & $t$(s) & nodes & $t$(s) & nodes & \\
+\midrule
+5part  & 5  & 0.01 & 1   & 0.01  & 1        & 1$\times$ \\
+10part & 10 & 0.16 & 1   & 4.45  & 62{,}430 & 28$\times$ \\
+11part & 11 & 0.08 & 1   & 2.68  & 32{,}517 & 34$\times$ \\
+12part & 12 & 0.19 & 742 & 6.68  & 70{,}481 & 35$\times$ \\
+13part & 13 & 0.34 & 1   & 41.78 & 346{,}500 & 123$\times$ \\
+14part & 14 & 0.05 & 1   & $60.0^\dagger$ & 333{,}206 & $>$1200$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The contrast is stark (Table~\ref{tab:milp}). The p-batch model is essentially
+trivial for the solver: it is solved at the \emph{root node} (one node, no
+branching) in under one second for every instance up to $n=14$, because the
+parallel-batch structure makes consolidating parts into a batch almost free and
+the LP relaxation nearly integral. The mix-batch model, by contrast, requires
+tens to hundreds of thousands of branch-and-bound nodes; its solve time grows
+from $4.5$\,s at $n=10$ to $41.8$\,s at $n=13$, and at $n=14$ it is \emph{not}
+solved within $60$\,s (optimality gap $25.6\%$). The solve-time ratio
+$t_{\text{mix}}/t_{\text{pb}}$ rises from $28\times$ to over $1200\times$. The
+additive volume term is what makes the difference: every part added to a batch
+elongates it and delays all downstream batches, which couples the batching and
+sequencing decisions and weakens the relaxation.
+
+Two consequences follow. First, the idealized p-batch model is not merely easier
+but a \emph{different} problem: its optimal tardiness is roughly half that of the
+mix-batch model on the same instances (e.g., $25.10$ versus $59.47$ on
+\texttt{13part}, $23.03$ versus $45.63$ on \texttt{10part}), so scheduling with
+the p-batch idealization systematically underestimates tardiness and yields
+optimistic, infeasible-in-practice decisions. Second, since the realistic
+mix-batch model is intractable for an off-the-shelf MILP already at $n=14$ on two
+machines, a problem-specific exact method is required---which motivates the
+branch-and-bound algorithm developed in the remainder of this section. (As a
+side check, the MILP mix-batch optima coincide with those of our
+branch-and-bound, e.g.\ $59.47$ on \texttt{13part} with $\bar M=2$, confirming
+both implementations solve the same problem.)
+
 \subsection{Single-Machine Oracle}
 \label{subsec:res_single}
 
@@ -1150,53 +1303,86 @@ Instance & $n$ & Total tardiness & Popped & Time (s) \\
 \end{tabular}
 \end{table}
 
-\subsection{Effect of the Local-Search Upper Bound}
-\label{subsec:res_ls}
+\subsection{Effect of the Diving Rule}
+\label{subsec:res_dive}
 
-We isolate the contribution of the local-search refinement
-(Section~\ref{subsubsec:ls_refine}) on the parallel-machine problem by comparing
-the default configuration against the same algorithm with the local search
-disabled. All other components are identical, and in every case the two
-configurations return the \emph{same} proven optimum, confirming that the
-refinement does not affect correctness. Table~\ref{tab:ls} reports the number of
-generated nodes and wall-clock time for $\bar M\in\{2,3,4\}$.
+The diving phase is intended both to obtain incumbents quickly and, when the
+active list grows beyond $N_{\max}$, to bound memory. We compare the depth-first
+dive (deepest node first, ties to the most balanced) against the balance-first
+rule (most balanced node first), reporting generated nodes and the peak size of
+the active list. Both rules leave the proven optimum unchanged.
+Table~\ref{tab:dive} shows that the depth-first dive is uniformly preferable: it
+reduces generated nodes by up to two orders of magnitude and shrinks the peak
+active list by three to four orders of magnitude (e.g.\ from $14{,}905$ to $23$
+on \texttt{15part} with $\bar M=3$). The balance-first rule does not descend; it
+sweeps the frontier by load level, so the active list grows quickly and, on the
+larger instances, it fails to prove optimality within the time limit while the
+depth-first dive proves it in seconds. This confirms that a genuine depth-first
+descent, not a balance-first sweep, is what makes the diving mode effective for
+both incumbents and memory.
 
 \begin{table}[t]
 \centering
-\caption{Local-search upper bound on the parallel-machine search. Nodes are
-generated nodes; both configurations return the same optimum.}
-\label{tab:ls}
-\begin{tabular}{l c r r r}
+\caption{Diving rule: generated nodes and peak active-list size. Both rules
+return the same optimum; $^\dagger$ marks runs that did not prove optimality
+within a $30$--$35$\,s limit (the depth-first dive proves all five).}
+\label{tab:dive}
+\begin{tabular}{l c r r r r}
 \toprule
 \multirow{2}{*}{Instance} & \multirow{2}{*}{$\bar M$}
- & \multicolumn{2}{c}{Generated nodes} & \multirow{2}{*}{Speed-up} \\
-\cmidrule(lr){3-4}
- & & Default & No LS & \\
+ & \multicolumn{2}{c}{Balance-first} & \multicolumn{2}{c}{Depth-first} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ & & Nodes & Peak & Nodes & Peak \\
 \midrule
-13part & 2 & 5{,}945   & 6{,}125   & $\approx$1$\times$ \\
-13part & 3 & 97{,}990  & 111{,}523 & $\approx$1$\times$ \\
-13part & 4 & 25{,}277  & 181{,}540 & 66$\times$ \\
-14part & 2 & 9{,}781   & 9{,}945   & $\approx$1$\times$ \\
-14part & 3 & 15{,}378  & 91{,}026  & 16$\times$ \\
-15part & 2 & 22{,}305  & 22{,}897  & $\approx$1$\times$ \\
-15part & 3 & 93{,}975  & 195{,}378 & 4.6$\times$ \\
-15part & 4 & 0         & 118{,}692 & 395$\times$ \\
+13part & 3 & 97{,}990            & 30{,}469  & 5{,}119  & 366 \\
+13part & 4 & 25{,}277            & 6{,}926   & 1{,}293  & 23 \\
+15part & 3 & 93{,}975            & 14{,}905  & 3{,}399  & 23 \\
+16part & 3 & 184{,}275$^\dagger$ & 122{,}602 & 52{,}173 & 4{,}413 \\
+18part & 3 & 65{,}022$^\dagger$  & 129{,}940 & 29{,}255 & 33 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Two regimes appear. For $\bar M=2$ the search is limited by the lower bound:
-the constructive incumbent is already near-optimal, so refining it has almost no
-effect (node counts change by a few percent). For $\bar M\ge 3$ the refinement
-is decisive, reducing both nodes and time by one to two orders of magnitude
-(e.g.\ $395\times$ on \texttt{15part} with $\bar M=4$). The acceleration arises
-from two distinct mechanisms identified in Section~\ref{subsubsec:ls_refine}: a
-tighter upper bound, and the warming of the memory pool with move-neighbor
-configurations that sharpen the node lower bound. Their relative importance is
-instance dependent. On \texttt{14part} with $\bar M=3$ the local search does not
-lower $UB$ at all, yet the warmed pool alone reproduces the full node reduction;
-on \texttt{15part} with $\bar M=3$ the reduction instead requires the tighter
-$UB$. The default configuration captures both.
+\subsection{Effect of the Local-Search Upper Bound}
+\label{subsec:res_ls}
+
+Under the depth-first dive, we next isolate the additional contribution of the
+local-search refinement (Section~\ref{subsubsec:ls_refine}) by toggling it while
+keeping everything else fixed. In every case both configurations return the same
+proven optimum. Table~\ref{tab:ls} reports the generated nodes for
+$\bar M\in\{2,3,4\}$. Because the depth-first dive already reaches a balanced,
+near-optimal incumbent quickly, the marginal effect of the local search is now
+small and instance dependent: it still helps on some configurations (e.g.\
+\texttt{15part} with $\bar M\in\{3,4\}$) but is neutral or slightly adverse on
+others (e.g.\ \texttt{14part} with $\bar M=3$). In other words, once the diving
+rule is corrected, the dive itself performs most of the incumbent tightening that
+the local search previously supplied, so the two are partly redundant. We keep
+the local search enabled by default because it is inexpensive and never increases
+the proven optimum.
+
+\begin{table}[t]
+\centering
+\caption{Local-search refinement under the depth-first dive (generated nodes).
+Both configurations return the same optimum.}
+\label{tab:ls}
+\begin{tabular}{l c r r}
+\toprule
+\multirow{2}{*}{Instance} & \multirow{2}{*}{$\bar M$}
+ & \multicolumn{2}{c}{Generated nodes} \\
+\cmidrule(lr){3-4}
+ & & Default & No LS \\
+\midrule
+13part & 2 & 5{,}065 & 5{,}215 \\
+13part & 3 & 5{,}119 & 6{,}127 \\
+13part & 4 & 1{,}293 & 4{,}457 \\
+14part & 2 & 6{,}397 & 5{,}877 \\
+14part & 3 & 6{,}399 & 2{,}445 \\
+15part & 2 & 9{,}865 & 9{,}881 \\
+15part & 3 & 3{,}399 & 8{,}910 \\
+15part & 4 & 0       & 1{,}546 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{A Negative Result on Free-Part Bounds}
 \label{subsec:res_freepar}
@@ -1218,6 +1404,57 @@ oracle increments; it requires the oracle value $\Phi$ to be supermodular in the
 part set, which fails empirically. Consequently, cheap valid strengthenings of
 the free-part bound appear exhausted, and the default configuration disables the
 positional free-part bound.
+
+\subsection{Pruning Heavily Unbalanced Assignments}
+\label{subsec:res_heavy}
+
+In contrast to the free-part bound, a bound on the \emph{assigned} side does pay
+off. As described in Section~\ref{subsubsec:heavy}, the analytical machine bound
+collapses to nearly zero on a heavily loaded machine, so the assignment search is
+not deterred from building extremely unbalanced complete assignments---one
+machine holding most of the parts---even though such assignments are essentially
+never optimal. Evaluating their leaves requires an exact oracle call on a large
+part set, which is costly. The heavy-machine oracle bound prunes these subtrees
+before any such call.
+
+The effect is pronounced on instances with loose due dates, where the overall
+tardiness is small and the analytical bounds are weakest. Table~\ref{tab:heavy}
+reports two $20$- and $19$-part instances under $\bar M=3$. With the heavy-machine
+bound disabled, the search spends essentially its entire time budget evaluating
+heavily unbalanced leaves (hundreds of exact oracle calls on subsets of twelve or
+more parts) and never escapes a poor incumbent. Enabling the bound collapses these
+large-subset calls (from $513$ to $22$, and from $102$ to $0$) and frees the
+budget to reach far better solutions: on \texttt{20part\_4-S} the incumbent
+improves from $8.29$ to $4.63$. Notably, the value $8.29$ reached without the
+bound is itself \emph{suboptimal}---the search had simply never reached the better
+region. On instances that already prove optimality within the limit ($n\le 18$),
+the heavy machine threshold is rarely crossed and the overhead is negligible
+(e.g.\ \texttt{18part}, $\bar M=3$, $1.04$\,s versus $1.23$\,s, same proven
+optimum).
+
+\begin{table}[t]
+\centering
+\caption{Heavy-machine oracle bound on loose-due-date instances ($\bar M=3$,
+$30$\,s limit). ``big calls'' counts exact oracle evaluations on subsets of
+$\ge 12$ parts. $^\ddagger$ the disabled-bound incumbent is suboptimal.}
+\label{tab:heavy}
+\begin{tabular}{l c r r r r}
+\toprule
+\multirow{2}{*}{Instance} & \multirow{2}{*}{$\bar M$}
+ & \multicolumn{2}{c}{incumbent} & \multicolumn{2}{c}{big calls} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ & & off & on & off & on \\
+\midrule
+20part\_4-S & 3 & $8.29^\ddagger$ & \textbf{4.63} & 513 & 22 \\
+19part      & 3 & 27.56           & \textbf{24.91} & 102 & 0  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This is a useful corrective to the common assumption that such large instances are
+purely lower-bound-limited: a meaningful part of the difficulty was the search
+exhausting its budget on provably irrelevant unbalanced leaves, which a cheap
+oracle-based bound on heavily loaded machines removes.
 
 \subsection{Scaling Behavior}
 \label{subsec:res_scaling}
@@ -1265,16 +1502,26 @@ redundant oracle calls and strengthens node bounds.
 
 The computational study yields three findings. First, the single-machine oracle
 proves optimality for up to $17$ parts within seconds, with the lower bound, not
-the incumbent, limiting larger sizes. Second, the move-based local-search upper
-bound accelerates the parallel-machine search by up to two orders of magnitude
-for three or more machines without affecting the proven optimum, acting both by
-tightening the incumbent and by warming the memoization pool with the
-configurations the search later visits. Third, a parallel positional free-part
+the incumbent, limiting larger sizes. Second, the diving rule used inside the
+search must be a genuine depth-first descent: replacing a balance-first selection,
+which sweeps the frontier by load level, with a deepest-node rule (ties broken
+toward balance) reduces both the search-tree size and the peak active-list size by
+up to several orders of magnitude and lets the algorithm prove optimality on
+instances the balance-first rule cannot, all without affecting the proven optimum.
+Once this rule is corrected, the move-based local-search upper bound becomes a
+minor, inexpensive refinement that the dive largely subsumes. Third, a parallel positional free-part
 bound, although valid, is structurally dominated by the per-part floor and gives
 no additional pruning, indicating that cheap free-part bound strengthenings are
-largely exhausted. Closing the optimality gap for $n\ge 18$ therefore appears to
-require a fundamentally stronger bounding scheme, such as branch-and-price over
-true batch columns, which we leave for future work.
+largely exhausted. Fourth, a complementary bound on the \emph{assigned} side---a
+short, budget-limited oracle run on any heavily loaded machine---prunes the
+extremely unbalanced assignments that the analytical bound fails to detect,
+eliminating wasted large-subset oracle calls and substantially improving
+incumbents on loose-due-date instances (e.g.\ from a suboptimal $8.29$ to $4.63$
+on a $20$-part instance); this reveals that part of the apparent gap stemmed from
+search effort wasted on provably irrelevant unbalanced leaves rather than from the
+bound alone. Closing the remaining gap for $n\ge 18$ nonetheless still calls for a
+fundamentally stronger bounding scheme, such as branch-and-price over true batch
+columns, which we leave for future work.
 
 %addtolength{\textheight}{-12cm}   
 

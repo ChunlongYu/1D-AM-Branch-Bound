@@ -24,6 +24,7 @@
 
 // vol/hh/ar/dd are per-part arrays for the (relabeled 0..n-1) subset.
 // TL<=0 means no time limit.  Returns optimal total tardiness; sets *provenOut.
+#include <limits>
 inline double solvePhi(int n,
     const std::vector<double>& vol, const std::vector<double>& hh,
     const std::vector<double>& ar,  const std::vector<double>& dd,
@@ -32,7 +33,8 @@ inline double solvePhi(int n,
     std::size_t N_MAX = 200000, std::size_t N_MIN = 50000,
     bool useInterch = true, bool usePos = true,
     double GAMMA = 0.0, double QFRAC = 0.5,
-    std::size_t FRONT_CAP = 25000000ULL)
+    std::size_t FRONT_CAP = 25000000ULL,
+    double* lbOut = nullptr, long long NODE_CAP = 0)
 {
     using namespace std;
     if(n<=0){ if(provenOut)*provenOut=true; return 0.0; }
@@ -132,6 +134,7 @@ inline double solvePhi(int n,
 
     while(!pq.empty()||!stk.empty()){
         if((popped&1023)==0 && TL>0.0){ double el=chrono::duration<double>(chrono::steady_clock::now()-t0).count(); if(el>TL){timedOut=true;break;} }
+        if(NODE_CAP>0 && popped>=NODE_CAP){ timedOut=true; break; }
         size_t sz=pq.size()+stk.size();
         if(sz>N_MAX) useBFS=false; else if(sz<N_MIN) useBFS=true;
         Node cur;
@@ -182,5 +185,15 @@ inline double solvePhi(int n,
         else { sort(kids.begin(),kids.end(),[](const Node&a,const Node&b){return a.LB>b.LB;}); for(auto&k:kids) stk.push_back(std::move(k)); }
     }
     if(provenOut)*provenOut=!timedOut;
+    if(lbOut){
+        if(!timedOut){ *lbOut=UB; }
+        else {
+            double gLB=std::numeric_limits<double>::infinity();
+            while(!pq.empty()){ if(pq.top().LB<gLB)gLB=pq.top().LB; pq.pop(); }
+            for(const auto& nd: stk) if(nd.LB<gLB) gLB=nd.LB;
+            if(!std::isfinite(gLB) || gLB>UB) gLB=UB;
+            *lbOut=gLB;
+        }
+    }
     return UB;
 }
