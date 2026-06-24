@@ -45,7 +45,7 @@ def read_instance(path):
     return machine, parts, due
 
 def solve_milp(machine, parts, due, M, time_limit=1800.0, sym_break=True, threads=0, output=True,
-               mode="mix"):
+               mode="mix", logfile=None, callback=None):
     # mode='mix'   : P(B) = S + V*sum(vol) + U*max(h)   (our realistic AM batch model)
     # mode='pbatch': P(B) = S +              U*max(h)   (idealized parallel batch, time = max only)
     import gurobipy as gp
@@ -97,7 +97,11 @@ def solve_milp(machine, parts, due, M, time_limit=1800.0, sym_break=True, thread
         m.addConstrs((gp.quicksum(z[mm,b] for b in B) >= gp.quicksum(z[mm+1,b] for b in B)
                       for mm in range(M-1)), "machsym")
 
-    t0 = time.time(); m.optimize(); elapsed = time.time() - t0
+    if logfile: m.Params.LogFile = logfile
+    t0 = time.time()
+    if callback is not None: m.optimize(callback)
+    else: m.optimize()
+    elapsed = time.time() - t0
     status = {GRB.OPTIMAL:"OPTIMAL", GRB.TIME_LIMIT:"TIME_LIMIT",
               GRB.INFEASIBLE:"INFEASIBLE"}.get(m.Status, str(m.Status))
     obj = m.ObjVal if m.SolCount > 0 else float("nan")

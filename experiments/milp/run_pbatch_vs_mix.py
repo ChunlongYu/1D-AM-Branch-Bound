@@ -30,10 +30,16 @@ def main():
     ap.add_argument("--modes", default="pbatch,mix")
     ap.add_argument("--tl", type=float, default=60.0)
     ap.add_argument("--threads", type=int, default=0)
+    ap.add_argument("--maxn", type=int, default=0, help="skip instances with n>maxn (0=no cap)")
     ap.add_argument("--out", default="results_pbatch_vs_mix.csv")
     args = ap.parse_args()
 
-    insts = [x.strip() for x in args.instances.split(",") if x.strip()]
+    import glob as _glob
+    if args.instances.strip().lower() == "all":
+        insts = sorted(os.path.splitext(os.path.basename(p))[0]
+                       for p in _glob.glob(os.path.join(args.datadir, "*.txt")))
+    else:
+        insts = [x.strip() for x in args.instances.split(",") if x.strip()]
     Ms    = [int(x) for x in args.M.split(",")]
     modes = [x.strip() for x in args.modes.split(",")]
 
@@ -52,6 +58,8 @@ def main():
         if len(due) != len(parts):
             print(f"[skip] {name}: no DueDate section"); continue
         n = len(parts)
+        if args.maxn and n > args.maxn:
+            print(f"[skip] {name}: n={n} > maxn={args.maxn}"); continue
         for M in Ms:
             for mode in modes:
                 print(f"\n>>> {name} n={n} M={M} mode={mode} (TL={args.tl}s) ...", flush=True)

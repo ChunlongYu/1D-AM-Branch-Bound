@@ -1,0 +1,18 @@
+# experiment: ht1_2-15_0.3_0.3_1  M=2  mode=mix  (MILP / Gurobi)
+# config: sym_break=1 threads=0 ; TL=3600s traceint=10s
+# date: 2026-06-24T12:32:44  wall=88.5s
+# model: 600 vars, 1079 constrs
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+TRACE t=0.0 ub=494.38 lb=0 gap=100.00 nodes=0
+TRACE t=10.2 ub=40.8483 lb=18.4901 gap=54.73 nodes=13884
+TRACE t=20.2 ub=40.8483 lb=22.6368 gap=44.58 nodes=29487
+TRACE t=32.1 ub=40.8483 lb=26.5641 gap=34.97 nodes=47356
+TRACE t=42.2 ub=40.8483 lb=26.5641 gap=34.97 nodes=51925
+TRACE t=52.5 ub=40.8483 lb=26.5641 gap=34.97 nodes=61469
+TRACE t=62.8 ub=40.8483 lb=29.3221 gap=28.22 nodes=79825
+TRACE t=72.9 ub=40.8483 lb=32.232 gap=21.09 nodes=97255
+TRACE t=83.3 ub=40.8483 lb=35.3221 gap=13.53 nodes=124710
+
+RESULT instance=ht1_2-15_0.3_0.3_1 n=15 M=2 mode=mix TT=40.8483 optimal=1 lb=40.8483 gap=0.0000 time=88.3999 nodes=139070 status=OPTIMAL
