@@ -1,0 +1,52 @@
+# experiment: ht1_1-10_0.3_0.3_1  M=2
+# config: HEAVY=1 diving=depth LS=1 ; TL=60s traceint=10s
+# date: 2026-06-24T08:23:24  wall=0.1s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.700000
+  Setup time: 2.000000
+  Size: 25.000000 x 25.000000 x 32.500000
+
+Parts Summary:
+  Part 0: 7.500000 x 7.500000 x 5.000000, Vol = 27.500000, Support = 10.750000
+  Part 1: 6.000000 x 2.000000 x 28.000000, Vol = 130.000000, Support = 0.000000
+  Part 2: 6.000000 x 2.000000 x 28.000000, Vol = 130.000000, Support = 0.000000
+  Part 3: 8.000000 x 4.000000 x 6.000000, Vol = 50.000000, Support = 5.000000
+  Part 4: 8.000000 x 4.000000 x 6.000000, Vol = 50.000000, Support = 5.000000
+  Part 5: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 6: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 7: 8.000000 x 2.000000 x 5.000000, Vol = 46.000000, Support = 10.000000
+  Part 8: 8.000000 x 2.000000 x 5.000000, Vol = 46.000000, Support = 10.000000
+  Part 9: 4.300000 x 5.000000 x 5.000000, Vol = 72.000000, Support = 12.000000
+
+Single-machine EDD initial Total Tardiness (info only): 264.992560
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 2
+
+TRACE t=0.0 ub=47.7943 lb=24.2246 gap=49.31 nodes=0
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [0, 1, 5, 6, 7, 8]  -> Phi = 25.578328
+  Machine 1 : [2, 3, 4, 9]  -> Phi = 22.120928
+
+Total Tardiness (UB): 47.699256
+Proven optimal: yes
+
+============= Parallel Search Info =============
+nodes processed:      754
+nodes generated:      789
+leaf nodes evaluated: 359
+incumbent updates:    1
+LB-pruned nodes:      36
+oracle calls:         531
+oracle cache hits:    22
+time:0.020000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht1_1-10_0.3_0.3_1.txt n=10 M=2 TT=47.6993 optimal=1 time=0.0198328 lb=47.6993 gap=0 nodes=754 oracle=531
+
+[stderr]
+[heavy] K=9 cap=100 calls=0 prunes=0

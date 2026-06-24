@@ -2,6 +2,7 @@
 #include <string>
 #include "BranchBound.h"
 #include <cstdlib>
+#include <cstdio>
 #include "../new_oracle/phi_oracle.h"
 
 static bool      g_useFreePar    = false;   // parallel positional free-part bound on/off (env FREEPAR)
@@ -13,6 +14,8 @@ static int       g_heavyK        = 0;      // 0 = off; set in solveParallelMachi
 static long long g_heavyCap      = 0;      // oracle node budget for the heavy LB
 static long long g_heavyPrunes   = 0, g_heavyCalls = 0;
 static std::unordered_map<uint64_t,double> g_heavyCache;
+// periodic UB/LB trace (env TRACE=1, TRACEINT seconds)
+static int g_trace=0; static double g_traceInt=10.0, g_lastTrace=-1e9;
 static long long g_freeParPrunes = 0;      // how many nodes it pruned (diagnostic)   // solvePhi() = the new strong single-machine oracle     // generateInitialSolution(), branch_and_cut() -> oracle Phi
 
 #include <algorithm>
@@ -54,6 +57,10 @@ struct Ctx {
 
     // memory pool of exact single-machine optima: bitmask(Q) -> Phi(Q)
     std::unordered_map<uint64_t, double> phiCache;
+
+    // optional sub-deadline (elapsed seconds) capping exact-Phi calls during the
+    // construction/move phase; <=0 means no sub-budget. See MOVEBUDGET.
+    double phiDeadline = -1.0;
 
     PBBParams params;
     PBBStats* stats = nullptr;
@@ -137,6 +144,14 @@ double Phi(Ctx& ctx, const std::vector<int>& Q, uint64_t qmask) {
         if (remaining <= 0.0) { ctx.stats->timed_out = true; remaining = 0.001; }
         tl = remaining;
     }
+    // move-phase sub-budget: during construction, cap each Phi call so a single
+    // pathological subset cannot swallow the whole run. Non-proven results from
+    // such capped calls are returned (valid UB) but NOT cached (see below).
+    if (ctx.phiDeadline > 0.0) {
+        double remPhase = ctx.phiDeadline - ctx.elapsed();
+        if (remPhase < 0.001) remPhase = 0.001;
+        if (tl <= 0.0 || remPhase < tl) tl = remPhase;
+    }
 
     // ---- exact single-machine optimum via the NEW strong oracle ----
     bool proven = true;
@@ -145,7 +160,11 @@ double Phi(Ctx& ctx, const std::vector<int>& Q, uint64_t qmask) {
                           (*ctx.L)[0] * (*ctx.Wv)[0], tl, &proven);
     if (!proven) ctx.stats->timed_out = true;
 
-    ctx.phiCache.emplace(qmask, phi);
+    // Cache ONLY proven-exact Phi values. lbMem() reuses phiCache entries as a
+    // lower bound on Phi(superset); a non-proven solvePhi returns an UPPER bound
+    // (incumbent), which would make lbMem unsafe and could prune the optimum.
+    // Non-proven values are still returned (a valid UB) but never cached.
+    if (proven) ctx.phiCache.emplace(qmask, phi);
     ++ctx.stats->oracle_calls;
     return phi;
 }
@@ -492,6 +511,18 @@ void buildInitialIncumbent(Ctx& ctx, const std::vector<int>& parts,
                            std::vector<std::vector<int>>& bestAssign,
                            std::vector<double>& bestPerMachine,
                            double& UB) {
+    // MOVEBUDGET (default off): fraction of the global TL the construction/move
+    // phase may spend on exact Phi. e.g. 0.2 -> Phi calls here are capped so the
+    // phase ends by 0.2*TL, leaving the rest for the actual B&B tree.
+    double savedDeadline = ctx.phiDeadline;
+    double moveFrac = 0.5;   // DEFAULT: construction/move phase may spend up to
+                             // 0.5*TL on exact Phi, leaving the rest for the tree.
+                             // MOVEBUDGET=0 disables; any other value overrides.
+    if (const char* e = getenv("MOVEBUDGET")) moveFrac = atof(e);
+    if (moveFrac > 0.0 && ctx.params.time_limit > 0.0)
+        ctx.phiDeadline = moveFrac * ctx.params.time_limit;
+    struct DeadlineGuard { Ctx& c; double saved;
+        ~DeadlineGuard(){ c.phiDeadline = saved; } } _dg{ctx, savedDeadline};
     auto makeOrder = [&](int rule) {
         std::vector<int> o = parts;
         std::sort(o.begin(), o.end(), [&](int a, int b) {
@@ -673,11 +704,20 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
     if (const char* e = getenv("HEAVYLB"))  g_heavyK  = atoi(e);   // explicit K override
     if (const char* e = getenv("HEAVYCAP")) g_heavyCap= atoll(e);  // explicit cap override
     g_heavyPrunes=0; g_heavyCalls=0; g_heavyCache.clear();
+    if (const char* e=getenv("TRACE"))    g_trace=atoi(e);
+    if (const char* e=getenv("TRACEINT")) g_traceInt=atof(e);
+    g_lastTrace=-1e9;
     g_freeParPrunes = 0;
 
     // ---- main loop ---------------------------------------------------------
     while (!active.empty()) {
         if (ctx.outOfTime()) { stats.timed_out = true; break; }
+        if (g_trace) { double el=ctx.elapsed();
+            if (el - g_lastTrace >= g_traceInt) {
+                double gLB=UB; for (const auto& nd: active) if (nd.LB<gLB) gLB=nd.LB;
+                double gp=(UB>1e-9)?(UB-gLB)/UB*100.0:0.0;
+                printf("TRACE t=%.1f ub=%.6g lb=%.6g gap=%.2f nodes=%lld\n", el, UB, gLB, gp, stats.generated_nodes);
+                fflush(stdout); g_lastTrace=el; } }
 
         // decide selection mode
         if (!warmupDone && improvements >= params.dfs_warmup_improvements) {
@@ -809,6 +849,7 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
         }
     }
 
+    { double gLB=UB; for (const auto& nd: active) if (nd.LB<gLB) gLB=nd.LB; stats.global_lb=gLB; }
     // ---- assemble result ---------------------------------------------------
     if (g_useFreePar) fprintf(stderr, "[freepar] gate=%.2f prunes=%lld\n", g_freeGate, g_freeParPrunes);
     if (g_heavyK>0) fprintf(stderr, "[heavy] K=%d cap=%lld calls=%lld prunes=%lld\n", g_heavyK, g_heavyCap, g_heavyCalls, g_heavyPrunes);

@@ -154,12 +154,15 @@ int main(int argc, char** argv) {
     log_and_cout("time:" + std::to_string(elapsed_seconds) + "s\n");
 
     // machine-parseable result line for batch comparison
+    double _gap = (psol.total_tardiness>1e-9)?(psol.total_tardiness-pstats.global_lb)/psol.total_tardiness*100.0:0.0;
     std::cout << "RESULT instance=" << filename
               << " n=" << parts.size()
               << " M=" << M
               << " TT=" << psol.total_tardiness
               << " optimal=" << (psol.proven_optimal ? 1 : 0)
               << " time=" << wall_seconds
+              << " lb=" << pstats.global_lb
+              << " gap=" << _gap
               << " nodes=" << pstats.total_nodes
               << " oracle=" << pstats.oracle_calls
               << std::endl;

@@ -59,6 +59,7 @@ struct PBBStats {
     long long oracle_cache_hits  = 0;  // Phi(Q) served from memory pool
     long long leaf_guard_skips   = 0;  // leaves pruned by incremental guard (oracle calls avoided)
     bool      timed_out          = false;
+    double    global_lb          = 0.0; // proven global lower bound (== UB if proven)
 };
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,134 @@
+# experiment: ht2_1-50_0.6_0.6_3  M=4
+# config: HEAVY=1 diving=depth LS=1 ; TL=600s traceint=10s
+# date: 2026-06-24T04:09:46  wall=600.0s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.250000
+  Setup time: 1.000000
+  Size: 80.000000 x 40.000000 x 50.000000
+
+Parts Summary:
+  Part 0: 7.000000 x 2.000000 x 35.000000, Vol = 150.000000, Support = 24.000000
+  Part 1: 35.000000 x 2.000000 x 7.000000, Vol = 140.000000, Support = 18.000000
+  Part 2: 5.000000 x 4.000000 x 6.000000, Vol = 60.000000, Support = 15.000000
+  Part 3: 5.000000 x 4.000000 x 6.000000, Vol = 60.000000, Support = 15.000000
+  Part 4: 5.000000 x 5.000000 x 2.700000, Vol = 20.700000, Support = 8.200000
+  Part 5: 8.000000 x 3.000000 x 4.000000, Vol = 50.000000, Support = 9.000000
+  Part 6: 8.000000 x 3.000000 x 4.000000, Vol = 50.000000, Support = 9.000000
+  Part 7: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 8: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 9: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 10: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 11: 5.000000 x 4.800000 x 5.000000, Vol = 90.000000, Support = 13.000000
+  Part 12: 2.500000 x 2.000000 x 3.800000, Vol = 10.500000, Support = 2.000000
+  Part 13: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 14: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 15: 8.000000 x 8.000000 x 8.000000, Vol = 340.000000, Support = 160.000000
+  Part 16: 8.000000 x 8.000000 x 8.000000, Vol = 340.000000, Support = 160.000000
+  Part 17: 18.000000 x 4.200000 x 5.000000, Vol = 100.000000, Support = 12.000000
+  Part 18: 5.000000 x 2.500000 x 3.000000, Vol = 14.000000, Support = 1.500000
+  Part 19: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 20: 6.000000 x 1.400000 x 2.000000, Vol = 15.000000, Support = 8.000000
+  Part 21: 5.000000 x 4.000000 x 7.500000, Vol = 62.000000, Support = 16.000000
+  Part 22: 5.000000 x 5.500000 x 6.000000, Vol = 80.000000, Support = 5.000000
+  Part 23: 16.700000 x 16.700000 x 10.700000, Vol = 173.600000, Support = 13.600000
+  Part 24: 4.300000 x 5.000000 x 5.000000, Vol = 85.000000, Support = 16.000000
+  Part 25: 7.000000 x 6.000000 x 1.800000, Vol = 50.000000, Support = 0.000000
+  Part 26: 7.000000 x 6.000000 x 1.800000, Vol = 50.000000, Support = 0.000000
+  Part 27: 6.250000 x 6.250000 x 4.000000, Vol = 9.600000, Support = 0.700000
+  Part 28: 7.000000 x 7.000000 x 3.000000, Vol = 60.000000, Support = 15.000000
+  Part 29: 7.000000 x 7.000000 x 3.000000, Vol = 60.000000, Support = 15.000000
+  Part 30: 7.500000 x 7.500000 x 4.500000, Vol = 78.600000, Support = 10.800000
+  Part 31: 5.000000 x 5.000000 x 2.000000, Vol = 13.700000, Support = 6.200000
+  Part 32: 5.000000 x 5.000000 x 2.000000, Vol = 13.700000, Support = 6.200000
+  Part 33: 5.000000 x 4.000000 x 7.600000, Vol = 98.000000, Support = 11.000000
+  Part 34: 5.000000 x 4.000000 x 7.600000, Vol = 98.000000, Support = 11.000000
+  Part 35: 7.000000 x 7.000000 x 2.400000, Vol = 60.000000, Support = 5.600000
+  Part 36: 7.000000 x 7.000000 x 2.400000, Vol = 60.000000, Support = 5.600000
+  Part 37: 4.590000 x 7.300000 x 1.500000, Vol = 40.000000, Support = 0.000000
+  Part 38: 10.000000 x 10.000000 x 6.000000, Vol = 200.000000, Support = 20.000000
+  Part 39: 10.000000 x 10.000000 x 6.000000, Vol = 200.000000, Support = 20.000000
+  Part 40: 5.000000 x 2.500000 x 3.000000, Vol = 15.000000, Support = 2.300000
+  Part 41: 5.000000 x 5.000000 x 2.700000, Vol = 22.400000, Support = 8.200000
+  Part 42: 6.000000 x 3.000000 x 33.000000, Vol = 200.000000, Support = 0.000000
+  Part 43: 8.400000 x 8.400000 x 2.880000, Vol = 103.680000, Support = 9.700000
+  Part 44: 8.400000 x 8.400000 x 2.880000, Vol = 103.680000, Support = 9.700000
+  Part 45: 5.000000 x 5.000000 x 3.000000, Vol = 23.300000, Support = 3.200000
+  Part 46: 3.000000 x 4.590000 x 38.000000, Vol = 216.000000, Support = 26.000000
+  Part 47: 3.000000 x 4.590000 x 38.000000, Vol = 216.000000, Support = 26.000000
+  Part 48: 5.000000 x 4.000000 x 7.500000, Vol = 50.000000, Support = 4.000000
+  Part 49: 5.000000 x 4.000000 x 7.500000, Vol = 50.000000, Support = 4.000000
+
+Single-machine EDD initial Total Tardiness (info only): 5182.656272
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 4
+
+TRACE t=191.9 ub=3.9925 lb=0 gap=100.00 nodes=0
+TRACE t=201.9 ub=3.9925 lb=0 gap=100.00 nodes=3582
+TRACE t=212.0 ub=3.9925 lb=0 gap=100.00 nodes=5758
+TRACE t=222.0 ub=3.9925 lb=0 gap=100.00 nodes=8282
+TRACE t=232.0 ub=3.9925 lb=0 gap=100.00 nodes=12730
+TRACE t=242.0 ub=3.9925 lb=0 gap=100.00 nodes=15254
+TRACE t=252.0 ub=3.9925 lb=0 gap=100.00 nodes=17910
+TRACE t=262.1 ub=3.9925 lb=0 gap=100.00 nodes=23222
+TRACE t=272.2 ub=3.9925 lb=0 gap=100.00 nodes=25574
+TRACE t=282.2 ub=3.9925 lb=0 gap=100.00 nodes=27654
+TRACE t=292.3 ub=3.9925 lb=0 gap=100.00 nodes=31990
+TRACE t=302.3 ub=3.9925 lb=0 gap=100.00 nodes=35054
+TRACE t=312.3 ub=3.9925 lb=0 gap=100.00 nodes=37098
+TRACE t=322.4 ub=3.9925 lb=0 gap=100.00 nodes=41370
+TRACE t=332.5 ub=3.9925 lb=0 gap=100.00 nodes=43946
+TRACE t=342.5 ub=3.9925 lb=0 gap=100.00 nodes=46182
+TRACE t=352.5 ub=3.9925 lb=0 gap=100.00 nodes=49822
+TRACE t=362.7 ub=3.9925 lb=0 gap=100.00 nodes=51570
+TRACE t=372.7 ub=3.9925 lb=0 gap=100.00 nodes=54758
+TRACE t=382.7 ub=3.9925 lb=0 gap=100.00 nodes=57686
+TRACE t=392.8 ub=3.9925 lb=0 gap=100.00 nodes=59898
+TRACE t=402.8 ub=3.9925 lb=0 gap=100.00 nodes=62354
+TRACE t=413.0 ub=3.9925 lb=0 gap=100.00 nodes=65170
+TRACE t=423.0 ub=3.9925 lb=0 gap=100.00 nodes=68074
+TRACE t=433.0 ub=3.9925 lb=0 gap=100.00 nodes=71678
+TRACE t=443.0 ub=3.9925 lb=0 gap=100.00 nodes=75202
+TRACE t=453.1 ub=3.9925 lb=0 gap=100.00 nodes=77450
+TRACE t=463.1 ub=3.9925 lb=0 gap=100.00 nodes=81806
+TRACE t=473.2 ub=3.9925 lb=0 gap=100.00 nodes=85262
+TRACE t=483.2 ub=3.9925 lb=0 gap=100.00 nodes=87962
+TRACE t=493.2 ub=3.9925 lb=0 gap=100.00 nodes=91974
+TRACE t=503.3 ub=3.9925 lb=0 gap=100.00 nodes=95270
+TRACE t=513.4 ub=3.9925 lb=0 gap=100.00 nodes=97762
+TRACE t=523.5 ub=3.9925 lb=0 gap=100.00 nodes=101494
+TRACE t=533.5 ub=3.9925 lb=0 gap=100.00 nodes=105210
+TRACE t=543.5 ub=3.9925 lb=0 gap=100.00 nodes=107698
+TRACE t=553.6 ub=3.9925 lb=0 gap=100.00 nodes=111014
+TRACE t=563.6 ub=3.9925 lb=0 gap=100.00 nodes=114762
+TRACE t=573.6 ub=3.9925 lb=0 gap=100.00 nodes=117534
+TRACE t=583.7 ub=3.9925 lb=0 gap=100.00 nodes=121334
+TRACE t=593.8 ub=3.9925 lb=0 gap=100.00 nodes=123222
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [6, 8, 11, 19, 20, 29, 31, 34, 35, 39, 40, 43]  -> Phi = 0.147088
+  Machine 1 : [0, 4, 7, 10, 25, 42, 45, 46, 47]  -> Phi = 1.678848
+  Machine 2 : [3, 5, 9, 13, 15, 17, 23, 24, 26, 27, 32, 33, 37, 41, 44, 48, 49]  -> Phi = 0.000000
+  Machine 3 : [1, 2, 12, 14, 16, 18, 21, 22, 28, 30, 36, 38]  -> Phi = 2.166560
+
+Total Tardiness (UB): 3.992496
+Proven optimal: no (time limit reached)
+
+============= Parallel Search Info =============
+nodes processed:      53404
+nodes generated:      126070
+leaf nodes evaluated: 21885
+incumbent updates:    0
+LB-pruned nodes:      72540
+oracle calls:         9959
+oracle cache hits:    8698
+time:600.003000s
+RESULT instance=e:\github\1d-am-branch-bound\Instances\Derived_Yu2022_identical\ht2_1-50_0.6_0.6_3.txt n=50 M=4 TT=3.9925 optimal=0 time=600.003 lb=0 gap=100 nodes=53404 oracle=9959
+
+[stderr]
+[heavy] K=17 cap=2500 calls=0 prunes=0

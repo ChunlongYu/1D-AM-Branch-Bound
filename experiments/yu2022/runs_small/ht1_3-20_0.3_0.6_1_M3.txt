@@ -1,0 +1,68 @@
+# experiment: ht1_3-20_0.3_0.6_1  M=3
+# config: HEAVY=1 diving=depth LS=1 ; TL=60s traceint=10s
+# date: 2026-06-24T08:29:27  wall=60.0s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.700000
+  Setup time: 2.000000
+  Size: 25.000000 x 25.000000 x 50.000000
+
+Parts Summary:
+  Part 0: 5.500000 x 5.000000 x 5.000000, Vol = 110.000000, Support = 0.000000
+  Part 1: 5.000000 x 5.000000 x 4.500000, Vol = 60.000000, Support = 13.000000
+  Part 2: 5.000000 x 5.000000 x 4.500000, Vol = 60.000000, Support = 13.000000
+  Part 3: 5.000000 x 2.000000 x 50.000000, Vol = 100.000000, Support = 0.000000
+  Part 4: 5.000000 x 2.000000 x 50.000000, Vol = 100.000000, Support = 0.000000
+  Part 5: 7.000000 x 4.000000 x 2.000000, Vol = 20.000000, Support = 5.000000
+  Part 6: 24.000000 x 6.000000 x 10.000000, Vol = 200.000000, Support = 0.000000
+  Part 7: 24.000000 x 6.000000 x 10.000000, Vol = 200.000000, Support = 0.000000
+  Part 8: 5.000000 x 2.500000 x 3.000000, Vol = 14.000000, Support = 1.500000
+  Part 9: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 10: 12.500000 x 12.500000 x 8.000000, Vol = 76.500000, Support = 5.800000
+  Part 11: 2.000000 x 7.000000 x 35.000000, Vol = 140.000000, Support = 8.600000
+  Part 12: 4.200000 x 5.000000 x 5.000000, Vol = 92.000000, Support = 12.000000
+  Part 13: 8.350000 x 8.350000 x 5.350000, Vol = 21.700000, Support = 1.700000
+  Part 14: 10.000000 x 2.000000 x 20.000000, Vol = 220.000000, Support = 10.000000
+  Part 15: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 16: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 17: 6.250000 x 6.250000 x 4.000000, Vol = 9.600000, Support = 0.700000
+  Part 18: 6.250000 x 6.250000 x 4.000000, Vol = 9.600000, Support = 0.700000
+  Part 19: 5.000000 x 5.500000 x 6.000000, Vol = 80.000000, Support = 5.000000
+
+Single-machine EDD initial Total Tardiness (info only): 681.078834
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 3
+
+TRACE t=7.0 ub=40.1552 lb=0 gap=100.00 nodes=0
+TRACE t=17.0 ub=29.2527 lb=0.870128 gap=97.03 nodes=27061
+TRACE t=27.0 ub=29.2527 lb=3.46285 gap=88.16 nodes=40651
+TRACE t=37.0 ub=25.0736 lb=3.78384 gap=84.91 nodes=56101
+TRACE t=47.0 ub=25.0736 lb=4.60171 gap=81.65 nodes=69351
+TRACE t=57.0 ub=25.0736 lb=5.67152 gap=77.38 nodes=89829
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [0, 5, 8, 11, 14, 15, 17, 18]  -> Phi = 19.222010
+  Machine 1 : [1, 2, 6, 7, 9, 10, 12, 13, 16, 19]  -> Phi = 5.678810
+  Machine 2 : [3, 4]  -> Phi = 0.172800
+
+Total Tardiness (UB): 25.073619
+Proven optimal: no (time limit reached)
+
+============= Parallel Search Info =============
+nodes processed:      36279
+nodes generated:      92670
+leaf nodes evaluated: 5341
+incumbent updates:    12
+LB-pruned nodes:      14637
+oracle calls:         5139
+oracle cache hits:    2942
+time:60.007000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht1_3-20_0.3_0.6_1.txt n=20 M=3 TT=25.0736 optimal=0 time=60.0064 lb=6.3888 gap=74.5198 nodes=36279 oracle=5139
+
+[stderr]
+[heavy] K=11 cap=400 calls=1061 prunes=46

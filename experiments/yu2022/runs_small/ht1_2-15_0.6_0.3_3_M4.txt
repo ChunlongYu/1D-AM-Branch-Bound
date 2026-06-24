@@ -1,0 +1,61 @@
+# experiment: ht1_2-15_0.6_0.3_3  M=4
+# config: HEAVY=1 diving=depth LS=1 ; TL=60s traceint=10s
+# date: 2026-06-24T08:24:26  wall=21.1s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.700000
+  Setup time: 2.000000
+  Size: 25.000000 x 25.000000 x 40.000000
+
+Parts Summary:
+  Part 0: 2.500000 x 2.000000 x 3.800000, Vol = 12.250000, Support = 1.400000
+  Part 1: 2.500000 x 2.000000 x 3.800000, Vol = 12.250000, Support = 1.400000
+  Part 2: 3.000000 x 1.600000 x 2.000000, Vol = 8.000000, Support = 0.000000
+  Part 3: 3.000000 x 1.600000 x 2.000000, Vol = 8.000000, Support = 0.000000
+  Part 4: 4.590000 x 7.300000 x 1.500000, Vol = 40.000000, Support = 0.000000
+  Part 5: 4.590000 x 7.300000 x 1.500000, Vol = 40.000000, Support = 0.000000
+  Part 6: 7.000000 x 4.590000 x 3.600000, Vol = 140.000000, Support = 8.000000
+  Part 7: 7.000000 x 7.000000 x 2.000000, Vol = 45.000000, Support = 12.000000
+  Part 8: 5.000000 x 5.500000 x 6.000000, Vol = 80.000000, Support = 5.000000
+  Part 9: 10.000000 x 4.000000 x 1.000000, Vol = 30.000000, Support = 0.000000
+  Part 10: 3.000000 x 5.000000 x 7.000000, Vol = 70.000000, Support = 12.000000
+  Part 11: 2.000000 x 3.000000 x 40.000000, Vol = 80.000000, Support = 0.000000
+  Part 12: 8.350000 x 8.350000 x 5.350000, Vol = 21.700000, Support = 1.700000
+  Part 13: 5.000000 x 4.000000 x 7.000000, Vol = 38.000000, Support = 10.000000
+  Part 14: 5.000000 x 4.000000 x 7.000000, Vol = 38.000000, Support = 10.000000
+
+Single-machine EDD initial Total Tardiness (info only): 639.035072
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 4
+
+TRACE t=0.0 ub=55.3941 lb=29.5162 gap=46.72 nodes=0
+TRACE t=10.0 ub=55.3879 lb=45.8691 gap=17.19 nodes=431890
+TRACE t=20.0 ub=55.3879 lb=54.5387 gap=1.53 nodes=643204
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [4, 5, 9, 11]  -> Phi = 35.359200
+  Machine 1 : [0, 1, 2, 3, 6]  -> Phi = 6.750952
+  Machine 2 : [10, 13, 14]  -> Phi = 10.218432
+  Machine 3 : [7, 8, 12]  -> Phi = 2.455498
+
+Total Tardiness (UB): 54.784082
+Proven optimal: yes
+
+============= Parallel Search Info =============
+nodes processed:      185468
+nodes generated:      662636
+leaf nodes evaluated: 6069
+incumbent updates:    2
+LB-pruned nodes:      490890
+oracle calls:         2995
+oracle cache hits:    5942
+time:21.072000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht1_2-15_0.6_0.3_3.txt n=15 M=4 TT=54.7841 optimal=1 time=21.0716 lb=54.7841 gap=0 nodes=185468 oracle=2995
+
+[stderr]
+[heavy] K=8 cap=225 calls=583 prunes=1102
