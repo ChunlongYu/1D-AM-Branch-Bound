@@ -1,0 +1,162 @@
+\begin{thebibliography}{16}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Article
+\bibitem[{Attaran(2017)}]{attaranRise3DPrinting2017}
+\bibinfo{author}{Attaran, M.}, \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{The rise of 3-{{D}} printing: {{The}} advantages of
+  additive manufacturing over traditional manufacturing}.
+\newblock \bibinfo{journal}{Business Horizons} \bibinfo{volume}{60},
+  \bibinfo{pages}{677--688}.
+%Type = Article
+\bibitem[{Che et~al.(2021)Che, Hu, Zhang and
+  Lim}]{cheMachineSchedulingOrientation2021}
+\bibinfo{author}{Che, Y.}, \bibinfo{author}{Hu, K.}, \bibinfo{author}{Zhang,
+  Z.}, \bibinfo{author}{Lim, A.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Machine scheduling with orientation selection and
+  two-dimensional packing for additive manufacturing}.
+\newblock \bibinfo{journal}{Computers \& Operations Research}
+  \bibinfo{volume}{130}, \bibinfo{pages}{105245}.
+%Type = Article
+\bibitem[{Chen et~al.(2026a)Chen, Ma, Sun and Zhao}]{chenLogicBasedBenders2026}
+\bibinfo{author}{Chen, J.}, \bibinfo{author}{Ma, W.}, \bibinfo{author}{Sun,
+  M.}, \bibinfo{author}{Zhao, Z.}, \bibinfo{year}{2026}a.
+\newblock \bibinfo{title}{Logic-based benders decomposition for additive
+  manufacturing scheduling on unrelated parallel machines}.
+\newblock \bibinfo{journal}{Annals of Operations Research}
+  \bibinfo{volume}{358}, \bibinfo{pages}{1169--1198}.
+\newblock \DOIprefix\doi{10.1007/s10479-026-07087-z}.
+%Type = Article
+\bibitem[{Chen et~al.(2026b)Chen, Ye, Xie, Sang and
+  Sterna}]{chenBendersDecompositionsOrder2026}
+\bibinfo{author}{Chen, J.}, \bibinfo{author}{Ye, X.}, \bibinfo{author}{Xie,
+  N.}, \bibinfo{author}{Sang, Y.W.}, \bibinfo{author}{Sterna, M.},
+  \bibinfo{year}{2026}b.
+\newblock \bibinfo{title}{Benders decompositions for order acceptance and
+  scheduling in additive manufacturing}.
+\newblock \bibinfo{journal}{European Journal of Operational Research}
+  \bibinfo{volume}{330}, \bibinfo{pages}{745--759}.
+\newblock \DOIprefix\doi{10.1016/j.ejor.2025.10.005}.
+%Type = Article
+\bibitem[{Chen and Powell(1999)}]{chenSolvingParallelMachine1999}
+\bibinfo{author}{Chen, Z.L.}, \bibinfo{author}{Powell, W.B.},
+  \bibinfo{year}{1999}.
+\newblock \bibinfo{title}{Solving parallel machine scheduling problems by
+  column generation}.
+\newblock \bibinfo{journal}{INFORMS Journal on Computing} \bibinfo{volume}{11},
+  \bibinfo{pages}{78--94}.
+\newblock \DOIprefix\doi{10.1287/ijoc.11.1.78}.
+%Type = Article
+\bibitem[{Kucukkoc(2019)}]{kucukkocMILPModelsMinimise2019}
+\bibinfo{author}{Kucukkoc, I.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{{{MILP}} models to minimise makespan in additive
+  manufacturing machine scheduling problems}.
+\newblock \bibinfo{journal}{Computers \& Operations Research}
+  \bibinfo{volume}{105}, \bibinfo{pages}{58--67}.
+%Type = Article
+\bibitem[{Mao et~al.(2024)Mao, Fu, Huang, Fang and
+  Chen}]{maoCombinatorialBendersDecomposition2024}
+\bibinfo{author}{Mao, Z.}, \bibinfo{author}{Fu, E.}, \bibinfo{author}{Huang,
+  D.}, \bibinfo{author}{Fang, K.}, \bibinfo{author}{Chen, L.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{Combinatorial {{Benders}} decomposition for single
+  machine scheduling in additive manufacturing with two-dimensional packing
+  constraints}.
+\newblock \bibinfo{journal}{European Journal of Operational Research}
+  \bibinfo{volume}{317}, \bibinfo{pages}{890--905}.
+%Type = Article
+\bibitem[{Mokotoff(2004)}]{mokotoffExactAlgorithmIdentical2004}
+\bibinfo{author}{Mokotoff, E.}, \bibinfo{year}{2004}.
+\newblock \bibinfo{title}{An exact algorithm for the identical parallel machine
+  scheduling problem}.
+\newblock \bibinfo{journal}{European Journal of Operational Research}
+  \bibinfo{volume}{152}, \bibinfo{pages}{758--769}.
+\newblock \DOIprefix\doi{10.1016/S0377-2217(02)00726-9}.
+%Type = Article
+\bibitem[{Nascimento et~al.(2026)Nascimento, Silva, Antunes, Maravelias and
+  Moniz}]{nascimentoImprovingEfficiencyLogicbased2026}
+\bibinfo{author}{Nascimento, P.J.}, \bibinfo{author}{Silva, C.},
+  \bibinfo{author}{Antunes, C.H.}, \bibinfo{author}{Maravelias, C.T.},
+  \bibinfo{author}{Moniz, S.}, \bibinfo{year}{2026}.
+\newblock \bibinfo{title}{Improving the efficiency of {{Logic-based Benders
+  Decomposition}} for p-batch scheduling problems with two-dimensional
+  packing}.
+\newblock \bibinfo{journal}{European Journal of Operational Research} ,
+  \bibinfo{pages}{S0377221726000767}.
+%Type = Article
+\bibitem[{Nascimento et~al.(2024)Nascimento, Silva, Antunes and
+  Moniz}]{nascimentoOptimalDecompositionApproach2024}
+\bibinfo{author}{Nascimento, P.J.}, \bibinfo{author}{Silva, C.},
+  \bibinfo{author}{Antunes, C.H.}, \bibinfo{author}{Moniz, S.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{Optimal decomposition approach for solving large
+  nesting and scheduling problems of additive manufacturing systems}.
+\newblock \bibinfo{journal}{European Journal of Operational Research}
+  \bibinfo{volume}{317}, \bibinfo{pages}{92--110}.
+%Type = Article
+\bibitem[{Oh et~al.(2020)Oh, Witherell, Lu and
+  Sprock}]{ohNestingSchedulingProblems2020}
+\bibinfo{author}{Oh, Y.}, \bibinfo{author}{Witherell, P.}, \bibinfo{author}{Lu,
+  Y.}, \bibinfo{author}{Sprock, T.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Nesting and scheduling problems for additive
+  manufacturing: {{A}} taxonomy and review}.
+\newblock \bibinfo{journal}{Additive Manufacturing} \bibinfo{volume}{36},
+  \bibinfo{pages}{101492}.
+%Type = Article
+\bibitem[{Pinto et~al.(2024)Pinto, Silva, Th{\"u}rer and
+  Moniz}]{pintoNestingSchedulingOptimization2024}
+\bibinfo{author}{Pinto, M.}, \bibinfo{author}{Silva, C.},
+  \bibinfo{author}{Th{\"u}rer, M.}, \bibinfo{author}{Moniz, S.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{Nesting and scheduling optimization of additive
+  manufacturing systems: {{Mapping}} the territory}.
+\newblock \bibinfo{journal}{Computers \& Operations Research}
+  \bibinfo{volume}{165}, \bibinfo{pages}{106592}.
+%Type = Article
+\bibitem[{Wu et~al.(2025)Wu, Yu and Yu}]{wuNestingSchedulingParallel2025}
+\bibinfo{author}{Wu, H.}, \bibinfo{author}{Yu, C.}, \bibinfo{author}{Yu, S.},
+  \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{Nesting and scheduling for parallel additive
+  manufacturing machines with uncertain processing times: A
+  simulation-optimisation approach}.
+\newblock \bibinfo{journal}{International Journal of Production Research} ,
+  \bibinfo{pages}{1--30}.
+%Type = Article
+\bibitem[{Yu and Lin(2024)}]{yuMathematicalProgrammingModel2024}
+\bibinfo{author}{Yu, C.}, \bibinfo{author}{Lin, J.}, \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{A mathematical programming model for minimizing
+  energy consumption on a selective laser melting machine}.
+\newblock \bibinfo{journal}{Mathematics} \bibinfo{volume}{12},
+  \bibinfo{pages}{2507}.
+\newblock \DOIprefix\doi{10.3390/math12162507}.
+%Type = Article
+\bibitem[{Yu et~al.(2022)Yu, Matta, Semeraro and
+  Lin}]{yuMathematicalModelsMinimizing2022}
+\bibinfo{author}{Yu, C.}, \bibinfo{author}{Matta, A.},
+  \bibinfo{author}{Semeraro, Q.}, \bibinfo{author}{Lin, J.},
+  \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{Mathematical {{Models}} for {{Minimizing Total
+  Tardiness}} on {{Parallel Additive Manufacturing Machines}}}.
+\newblock \bibinfo{journal}{IFAC-PapersOnLine} \bibinfo{volume}{55},
+  \bibinfo{pages}{1521--1526}.
+%Type = Article
+\bibitem[{Zipfel et~al.(2024)Zipfel, Tamke and
+  Kuttner}]{zipfelNewBranchandcutApproach2024}
+\bibinfo{author}{Zipfel, B.}, \bibinfo{author}{Tamke, F.},
+  \bibinfo{author}{Kuttner, L.}, \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{A new branch-and-cut approach for integrated planning
+  in additive manufacturing}.
+\newblock \bibinfo{journal}{European Journal of Operational Research} ,
+  \bibinfo{pages}{S0377221724008439}.
+
+\end{thebibliography}
