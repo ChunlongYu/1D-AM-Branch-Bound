@@ -115,7 +115,38 @@ Metal additive manufacturing has been increasingly adopted not only in establish
 
 To meet the growing demand for customized metal parts, manufacturers commonly operate multiple AM machines in parallel. As illustrated in Fig. 1, heterogeneous parts with different geometries, dimensions, build heights, and due dates must be assigned to machines, grouped into feasible build batches, and sequenced for processing. Parts grouped into the same batch are fabricated simultaneously on a common build platform and therefore share the completion time of that batch. Once a batch is completed, its constituent parts become available for delivery, and their completion times directly affect whether individual due dates can be met.
 
+
+\begin{figure*}[!t]
+	\centering
+	\includegraphics[width=\textwidth]{Figures/Cloud AM Scheduling.pdf}
+	\caption{Illustration of the scheduling process in a parallel metal additive manufacturing system, including customer orders, part-to-machine assignment, batch formation, batch sequencing, batch processing, and order delivery.}
+	\label{fig:cloud_am_scheduling}
+\end{figure*}
+
+
 Machine assignment, batch formation, and batch sequencing directly determine part completion times and therefore have a substantial impact on due-date performance. Ineffective scheduling decisions may result in considerable total tardiness, making scheduling a critical operational problem in parallel metal AM systems. Accordingly, a growing body of research has investigated production scheduling problems in AM systems.
+
+Most of the AM scheduling studies focus on makespan optimizatiion, only a few takcles the due-date performance. Yu et al. 2022 study the scheduling of unrelated parallel AM machines for total tardiness. Wu et al. 2022 consider the scheduling problem of a cloud AM system. Wu eet al. 2025 studies the scheduling problem of unrelated parallel AM machines to reduce tardy delivery, while considering the uncertainties in processing times. However, these studies relay on heuristic or metaheuristics that cannot provide guarantees on optimality. 
+
+Exact approaches for AM scheduling have been receiving increasing attentions. Zipfel et al. (2024) propose a branch and cut method for makespan optimization of parallel AM machines. Mao et al. (2024) propose a combinatorial benders decomposition appraoch for the same problem. To the best of our knowledge, Nascimento et al. 2024 is the only study that tackles the total tardiness for parallel AM machines. They use the combinatorial bedners decompostion framework, where the master problem is a 1D simplified batch machine scheduling problem, and the subproblem checkes the bin-packing feasibility of unregular 2D parts. Nascimento et al. 2026 further improves the efficiency of the framework by XXX. However, in these studies, the p-batch assumption is made for the batch processing time, i.e., the batch processing time equal to the longest processing time of the part in the batch. While in metal additive manufacturing, this might not be accurate. 
+
+\begin{figure}[tb]
+	\begin{center}
+		\centering
+		\resizebox*{15.0cm}{!}{\includegraphics{figures/SLM Process.pdf}}\hspace{1pt}
+		\caption{The process of SLM. In the powder material layering stage, the build platform is lowered by a specific amount corresponding to the thickness of the next layer. Then, a recoater blade moves a thin layer of powder from the powder container to the printing area. After, in the laser melting stage, the laser scans the specified area, melting the powder to form a solid structural layer of the part. These steps continues untill the build is completed. }
+		\label{fig:slm_process}
+	\end{center}
+\end{figure}
+
+Fig. 2 shows the process of printing a batch with SLM technology. The batch processing time consists of mainly three parts: batch setup time (inlucidng preheating and cooling), recoating time (related to the highest part height in the batch), and the laser scanning time, which is proportional to the total volume of parts in the batch. This means that, as the number of parts in the batch grows, the batch processing time would increase obviously, which makes the batch a mix-batch rather than a p-batch. According to the real-world experiments performed by Lv et al. (2021), the laser scanning time can account for about 25 \% of the total batch processing time. This percentage can go up to 50\% when a fuller batch is used, as shown in Lin and Yu (2025). Neglecting such factor (i.e., use the longest )would generate considerable biase between the model and the real implemtation. 
+
+Replacing the p-batch assumption by the more realistic m-batch feature is non-trival. Firstly, it makes the decision problem more complex because "packing as more as possible parts into a batch" is no longer a thumb of rule for the total tardiness objective because a full batch might lead to a long processing time and pospone the delivery for all parts in the batch. The scheduler has to balance between sharing common batch time and maintaining delivery flexibility, as indicated by Yu et al. (2022). Second, the chanllenge also comes from the computational perspective. According to our numerical experiments (detained in Section XX), replacing the batch time calculation in the MILP model for the parallel AM scheduling problem dramatically lower the sovability of the model in 3600 seconds. The underly reason is due to a looser lower bound of the LP relaxation of the original model. Such impact is large. Because currently most of the exact approach for nesting and scheduling on AM machines relay on the logit-base benders decomposition framework whose master problem is a scheduling problem with bin-packing relaxation, and typically soved by off-the-shelf solver such as Cplex or gurobi. When the master scheduling problem becomes hard to solve, the application of these methods becomes difficult. And an efficient ad-hoc approach to solve the master problem becomes importance, which we believe is not be proposed. 
+
+Motivated by this gap, this study focus on the schedulng problem for parallel AM machines to mimize the total tardiness. We aim at proposing an efficent exact approach for solving the scheduling problem, where the nesting part is simplied by a 1D capacity constraint. Our contribution is as follows:
+
+
+
 
 
 \section{LITERATURE REVIEW}
