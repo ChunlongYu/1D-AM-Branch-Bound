@@ -1,0 +1,10 @@
+# experiment: ht1_3-20_0.3_0.6_1  M=3  mode=pbatch  (MILP / Gurobi)
+# config: sym_break=1 threads=0 ; TL=3600s traceint=10s
+# date: 2026-06-24T21:50:58  wall=0.4s
+# model: 1540 vars, 2739 constrs
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+TRACE t=0.1 ub=350.814 lb=0 gap=100.00 nodes=0
+
+RESULT instance=ht1_3-20_0.3_0.6_1 n=20 M=3 mode=pbatch TT=0 optimal=1 lb=0 gap=0.0000 time=0.2677 nodes=1 status=OPTIMAL

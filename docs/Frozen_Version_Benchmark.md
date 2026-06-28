@@ -34,10 +34,11 @@
 | `LS` | 1(move 邻域局部搜索初始上界,**开**) |
 | `WARM` | 0(显式暖缓存,关;LS 开时基本冗余) |
 | `FREEPAR` | 0(并行位置自由零件界,关;已证被 singleTard 压制) |
-| `HEAVY` | 1(**重载机器强界**,开;`HEAVY=0` 关)。机器件数 ≥ K=⌈n/M⌉+4 时,用小预算(n² 节点)的单机 oracle LB 顶替 lbPos≈0,在内部节点剪掉极不平衡的垃圾子树。自适应、无手调参 |
-| `MOVEBUDGET` | 0.5(**构造/move 阶段预算**,默认 0.5·TL)。构造阶段每次精确 Φ 受 `min(剩余, 0.5·TL)` 限时,防止单个大子集的精确求解吞掉整段时间导致主循环 0 节点。非 proven 的限时结果照常作 UB 用但**不入缓存**(保 lbMem 安全)。`MOVEBUDGET=0` 关。 |
+| `HEAVY` / `HEAVYMARGIN` | 1 / **2(标定值)**。机器件数 ≥ K=⌈n/M⌉+`HEAVYMARGIN` 时,用小预算(n² 节点)的单机 oracle LB 顶替 lbPos≈0,在内部节点剪掉极不平衡的垃圾子树。`HEAVY=0` 关。margin 由 DOE 主效应取 2(效应在噪声量级) |
+| `MOVEBUDGET` | **0.3(标定值)**(**构造/move 阶段预算**,0.3·TL)。构造阶段每次精确 Φ 受 `min(剩余, 0.3·TL)` 限时,防止单个大子集吞掉整段时间致主循环 0 节点。非 proven 限时结果作 UB 但**不入缓存**(保 lbMem)。`MOVEBUDGET=0` 关。安全阀,DOE 中效应在噪声量级 |
 | `N_max / N_min` | 200000 / 50000 |
-| `strong_branch_candidates` | 8 |
+| `SCORE`(分支打分) | **spread(标定值)**;强分支按 child-LB 的 spread=max−min 打分。DOE:spread/sum 并列优,**min 最差**(主导因素之一) |
+| `CAND`(`strong_branch_candidates`) | **8(标定值)**;强分支候选件数。DOE 最强主效应:k=8 最优,**k=4 明显最差** |
 
 构建:`cd src && g++ -std=c++17 -O2 -o pbb main.cpp ParallelBranchBound.cpp BranchBound.cpp InstanceData.cpp`
 运行:`./pbb <inst> <M> <TL秒>`

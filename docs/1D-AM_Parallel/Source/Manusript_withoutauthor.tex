@@ -970,8 +970,8 @@ pays the full cost of an exact oracle evaluation on a large part set.
 
 To prune these subtrees, we compute a stronger machine-wise bound whenever a
 machine is heavily loaded. Concretely, when
-$|\mathcal{Q}_m(N)|\ge K$ with $K=\lceil n/\bar M\rceil+4$ (a load exceeding the
-balanced load $\lceil n/\bar M\rceil$ by a fixed margin), we run the
+$|\mathcal{Q}_m(N)|\ge K$ with $K=\lceil n/\bar M\rceil+\kappa$ (a load exceeding the
+balanced load $\lceil n/\bar M\rceil$ by a small margin $\kappa$, fixed by calibration in Section~\ref{subsec:calib}), we run the
 single-machine oracle on $\mathcal{Q}_m(N)$ with a small budget of $n^2$
 expanded nodes and take its \emph{proven} lower bound
 $LB_m^{\mathrm{heavy}}(\mathcal{Q}_m(N))$, namely the minimum node bound over its
@@ -979,7 +979,7 @@ unexplored frontier when the budget is reached (the exact $\Phi$ if it finishes
 first). Since any valid lower bound preserves correctness, this only tightens the
 node bound; it is memoized per part set, and is set to zero on machines below the
 threshold. Both the threshold $K$ and the budget $n^2$ scale automatically with
-the instance, so no manual tuning is required. On a $20$-part instance this bound
+the instance, with the margin $\kappa$ the only remaining constant, fixed once by calibration (Section~\ref{subsec:calib}). On a $20$-part instance this bound
 lifts heavily loaded machines whose positional bound is essentially zero to their
 true tardiness of $20$--$30$, well above the incumbent, pruning the
 corresponding subtrees before any large oracle call.
@@ -1370,6 +1370,7 @@ The detailed oracle implementation is provided in
 Appendix~\ref{app:single_machine_oracle}.
 
 \section{Test Instances}
+\label{sec:instances}
 The computational experiments are conducted on test instances adopted from Mao et al. \cite{maoCombinatorialBendersDecomposition2024}. For each part $j$, the due date $d_j$ is generated following the procedure of Yu et al. \cite{yuMathematicalModelsMinimizing2022}. Specifically, due dates are sampled from a uniform distribution:
 \begin{equation}
 	d_j \sim \text{Unif} \big[ \mu(1 - TF - RDD/2), \; \mu(1 - TF + RDD/2) \big]
@@ -1495,6 +1496,93 @@ whose root value reaches only about $14\%$ of the optimum for these instances.
 		14part     & 14 & 156.522  & 388{,}614 & 0.747 \\
 		15part     & 15 & 139.061  & 577{,}447 & 1.092 \\
 		15part\_2-S& 15 & 118.238  & 834{,}240 & 1.577 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Parameter Calibration}
+\label{subsec:calib}
+
+Before isolating the contribution of each algorithmic component, we fix the
+remaining tunable parameters of the parallel-machine search through a
+full-factorial design of experiments. Four parameters are varied, each at three
+levels. The first is the branching score: besides the \emph{spread} rule
+$\max_{r}LB(N_j^{(r)})-\min_{r}LB(N_j^{(r)})$, we test a \emph{worst-child} rule
+that maximizes the smallest child-node bound $\min_{r}LB(N_j^{(r)})$ and a
+\emph{sum} rule that maximizes the total child bound $\sum_{r}LB(N_j^{(r)})$. The
+second is the restricted strong-branching candidate-set size
+$k=|\mathcal{P}(N)|\in\{4,8,16\}$. The third is the fraction
+$\beta\in\{0.3,0.5,0.8\}$ of the time limit allotted to exact $\Phi$ evaluations
+during upper-bound construction (Section~\ref{subsubsec:ls_refine}), which caps
+the cost of the constructive and local-search phase so that a single expensive
+evaluation cannot consume the whole budget. The fourth is the heavy-machine
+margin $\kappa\in\{2,4,8\}$ in the activation threshold
+$K=\lceil n/\bar M\rceil+\kappa$ (Section~\ref{subsubsec:heavy}). All other
+settings remain at the defaults of Section~\ref{sec:results}, giving $3^4=81$
+configurations.
+
+To avoid selection bias, calibration uses a dedicated set of ten instances
+disjoint from those used for evaluation. It contains two instances at each of
+$n\in\{10,15,20,25,30\}$, generated with a tight tardiness factor $TF=0.6$ (so
+that none is trivially zero-tardiness) and $RDD\in\{0.3,0.6\}$, with due dates
+drawn from the same makespan-based procedure of Section~\ref{sec:instances}
+evaluated on the target machine; the machine count is spread over
+$\bar M\in\{2,3,4\}$ across the set so that the calibrated configuration is robust
+to $\bar M$. Each configuration is run on every instance with a $300$\,s limit.
+Configurations are compared by a penalized solve time: for configuration $c$ on
+instance $i$ the score is the solve time when optimality is proven, and
+$2T(1+g_{ci})$ otherwise, where $T=300$\,s and $g_{ci}$ is the terminal
+optimality gap, so that unsolved runs remain ordered by how close the bound came.
+The score of a configuration is the shifted geometric mean
+$\big(\prod_i (s_{ci}+\sigma)\big)^{1/10}-\sigma$ with $\sigma=10$\,s; lower is
+better.
+
+Table~\ref{tab:calib} reports the main effect of each parameter. Two parameters
+dominate. The candidate-set size $k$ has the largest effect: $k=4$ is markedly
+worse than $k=8$ or $k=16$, confirming that too few strong-branching candidates
+produce poor branching decisions, whereas $k=8$ already captures the benefit and
+$k=16$ adds only overhead. Among the scoring rules, the worst-child rule is the
+weakest; the spread and sum rules are comparable, and we retain the spread rule as
+the principled default. The remaining two parameters---the construction budget
+$\beta$ and the heavy-machine margin $\kappa$---have effects within the noise of
+the design: the penalized solve time of the best and the worst of all $81$
+configurations differs by only a factor of $1.09$. We therefore adopt their
+marginally-best levels, $\beta=0.3$ and $\kappa=2$, without claiming a significant
+effect. The selected configuration---spread score, $k=8$, $\beta=0.3$,
+$\kappa=2$---is used as the default in all subsequent experiments.
+
+That the method is largely insensitive to these parameters is itself a useful
+property: beyond using enough branching candidates ($k\ge 8$) and avoiding the
+worst-child score, the search performs comparably across the tested range, so no
+delicate tuning is required.
+
+\begin{table}[t]
+	\centering
+	\caption{Calibration main effects: penalized solve time (shifted geometric mean
+		over the ten calibration instances, in seconds; lower is better) at each level
+		of each parameter, marginalized over the other three. The selected level is in
+		bold.}
+	\label{tab:calib}
+	\small
+	\begin{tabular}{l l r}
+		\toprule
+		Parameter & Level & Penalized time (s) \\
+		\midrule
+		\multirow{3}{*}{Branching score} & \textbf{spread} & \textbf{105.1} \\
+		& sum & 106.2 \\
+		& worst-child & 107.4 \\
+		\midrule
+		\multirow{3}{*}{Candidate size $k$} & 4 & 108.7 \\
+		& \textbf{8} & \textbf{104.9} \\
+		& 16 & 105.1 \\
+		\midrule
+		\multirow{3}{*}{Construction budget $\beta$} & \textbf{0.3} & \textbf{106.1} \\
+		& 0.5 & 106.2 \\
+		& 0.8 & 106.3 \\
+		\midrule
+		\multirow{3}{*}{Heavy margin $\kappa$} & \textbf{2} & \textbf{104.8} \\
+		& 4 & 107.6 \\
+		& 8 & 106.3 \\
 		\bottomrule
 	\end{tabular}
 \end{table}

@@ -515,7 +515,7 @@ void buildInitialIncumbent(Ctx& ctx, const std::vector<int>& parts,
     // phase may spend on exact Phi. e.g. 0.2 -> Phi calls here are capped so the
     // phase ends by 0.2*TL, leaving the rest for the actual B&B tree.
     double savedDeadline = ctx.phiDeadline;
-    double moveFrac = 0.5;   // DEFAULT: construction/move phase may spend up to
+    double moveFrac = 0.3;   // DEFAULT (calibrated): construction/move phase may spend up to
                              // 0.5*TL on exact Phi, leaving the rest for the tree.
                              // MOVEBUDGET=0 disables; any other value overrides.
     if (const char* e = getenv("MOVEBUDGET")) moveFrac = atof(e);
@@ -696,9 +696,11 @@ std::pair<PBBSolution, PBBStats> solveParallelMachine(
 
     if (const char* e = getenv("FREEPAR"))  g_useFreePar = (atoi(e) != 0);
     if (const char* e = getenv("FREEGATE")) g_freeGate   = atof(e);
+    // strong-branching candidate count k (0 => score all unassigned parts).
+    if (const char* e = getenv("CAND"))     ctx.params.strong_branch_candidates = atoi(e);
     // heavy-machine strong bound: default ON; HEAVY=0 disables.  Auto K and cap.
     { bool on=true; if(const char* e=getenv("HEAVY")) on=(atoi(e)!=0);
-      int margin=4; if(const char* e=getenv("HEAVYMARGIN")) margin=atoi(e);
+      int margin=2; if(const char* e=getenv("HEAVYMARGIN")) margin=atoi(e);  // calibrated default
       if(on){ g_heavyK = (ctx.n + ctx.M - 1)/ctx.M + margin; g_heavyCap = (long long)ctx.n*ctx.n; }
       else  { g_heavyK = 0; } }
     if (const char* e = getenv("HEAVYLB"))  g_heavyK  = atoi(e);   // explicit K override
