@@ -1771,6 +1771,95 @@ such as branch-and-price over true batch columns, which is left for future work.
 	\end{tabular}
 \end{table}
 
+%====================================================================
+\subsection{Exact Comparison on a Yu-Derived Parallel Benchmark}
+\label{subsec:res_yubench}
+
+To assess the method on independent parallel-machine instances, we use a
+benchmark derived from the heterogeneous-machine instances of Yu et
+al.~\cite{yuMathematicalModelsMinimizing2022}. Each source instance is reduced to
+a single identical AM machine (the smaller platform of the source), one
+footprint-fitting orientation per part, and part volumes only. Instances span
+$n\in\{10,15,20,25,30\}$ parts, $\bar M\in\{2,3,4\}$ machines, and four due-date
+settings $(TF,RDD)\in\{0.3,0.6\}^2$. Due dates follow the makespan-based
+procedure of Section~\ref{sec:instances} evaluated on the derived machine with our
+batch model $P(B)=S+V\sum_{j\in B}v_j+U\max_{j\in B}h_j$; the makespan is
+estimated for the
+most-parallel configuration ($\bar M=4$) so that even that configuration is
+non-trivial, and lower $\bar M$ are only tighter. All runs are single-threaded
+with a $3600$\,s limit.
+
+Figure~\ref{fig:yu_pbmix} confirms, on this parallel benchmark, the effect first
+seen in Section~\ref{subsec:res_milp}: the realistic mix-batch model is far harder
+for a general MILP than the idealized p-batch model. The MILP proves optimality
+for every p-batch instance (60/60) within seconds, but for only $27/60$ mix-batch
+instances within an hour; on the jointly solved instances the mix-batch model is a
+median $\sim\!126\times$ slower. This motivates the tailored branch-and-bound.
+
+Figure~\ref{fig:yu_frontier} characterizes the branch-and-bound. It proves
+optimality for all $n\le 15$ within seconds; $n=20$ is the frontier, solved in
+$8/12$ cases (all $\bar M=4$, and the looser due-date settings at $\bar M=2,3$),
+while for $n\ge 25$ it returns strong incumbents but does not close the gap---the
+bottleneck is the lower bound, whose value collapses toward zero on the congested
+large instances. The machine count is a strong second axis: more machines yield
+smaller single-machine subproblems and thus larger solvable sizes (panel c).
+
+Figure~\ref{fig:yu_vs} is the head-to-head comparison of the two exact methods on
+the same instances under the same $3600$\,s limit. Across the $59$ non-trivial
+$(\text{instance},\bar M)$ cells, the branch-and-bound never loses: it proves
+optimality on $6$ cells the MILP cannot, and none the other way; on the jointly
+solved instances it is a median $\sim\!96\times$ faster (every point lies below the
+diagonal in panel a); and its exact reach extends one size class further, proving
+$67\%$ of the $n=20$ cells versus $17\%$ for the MILP (panel b). Beyond $n=25$
+both methods are bound-limited and prove nothing.
+
+For completeness we note one honest exception, which was excluded from
+Figure~\ref{fig:yu_vs} as a trivial (zero-tardiness) instance: a single
+$n=30$, $\bar M=4$, loose-due-date cell whose optimum is $0$. The MILP proves it at
+the root (its relaxation is already zero), whereas the branch-and-bound times out:
+its lower bound is correctly $0$, but the constructive heuristic does not recover
+the zero-tardiness schedule, so it can neither improve nor certify its incumbent.
+This is, once more, a lower-bound-side limitation, and it is precisely the weakness
+that a Dantzig--Wolfe/branch-and-price reformulation would address.
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.66\textwidth]{Figures/fig_pbatch_vs_mix.pdf}
+	\caption{p-batch versus mix-batch MILP solve time on the Yu-derived benchmark
+		($3600$\,s limit, coloured by $n$). Every point lies above the diagonal:
+		the additive volume term makes the realistic mix-batch model a median
+		$\sim\!126\times$ harder; the MILP solves all $60$ p-batch instances but
+		only $27$ mix-batch ones. Points on the top rule hit the time limit.}
+	\label{fig:yu_pbmix}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=\textwidth]{Figures/fig_bnb_frontier.pdf}
+	\caption{Branch-and-bound on the Yu-derived benchmark ($3600$\,s), by machine
+		count $\bar M$. (a) Solve time versus $n$; filled markers are proven
+		optimal, open markers on the top rule hit the limit. (b) Final optimality
+		gap versus $n$: near zero up to $n=20$, large and bound-limited beyond.
+		(c) Fraction proven optimal over the four due-date settings per
+		$(n,\bar M)$ cell; more machines enlarge the solvable region.}
+	\label{fig:yu_frontier}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=\textwidth]{Figures/fig_milp_vs_bnb.pdf}
+	\caption{Head-to-head of the mix-batch MILP and the branch-and-bound on the
+		same instances under the same $3600$\,s limit. (a) Per-cell solve time,
+		MILP ($x$) versus branch-and-bound ($y$); all $59$ non-trivial cells lie on
+		or below the diagonal (branch-and-bound at least as fast), with a median
+		$\sim\!96\times$ speed-up on jointly solved instances. (b) Fraction proven
+		optimal by size: the methods tie up to $n=15$, but at the $n=20$ frontier
+		the branch-and-bound proves $67\%$ versus $17\%$ for the MILP. One trivial
+		zero-tardiness cell is excluded.}
+	\label{fig:yu_vs}
+\end{figure}
+
+
 \section{CONCLUSIONS}
 
 

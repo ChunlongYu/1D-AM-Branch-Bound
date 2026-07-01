@@ -1,0 +1,297 @@
+# experiment: ht2_1-50_0.3_0.3_1  M=4
+# config: HEAVY=1 diving=depth LS=1 ; TL=3600s traceint=10s
+# date: 2026-06-29T08:20:21  wall=3600.5s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.140000
+  Setup time: 1.000000
+  Size: 40.000000 x 40.000000 x 40.000000
+
+Parts Summary:
+  Part 0: 7.000000 x 2.000000 x 35.000000, Vol = 150.000000, Support = 24.000000
+  Part 1: 35.000000 x 2.000000 x 7.000000, Vol = 140.000000, Support = 18.000000
+  Part 2: 5.000000 x 4.000000 x 6.000000, Vol = 60.000000, Support = 15.000000
+  Part 3: 5.000000 x 4.000000 x 6.000000, Vol = 60.000000, Support = 15.000000
+  Part 4: 5.000000 x 5.000000 x 2.700000, Vol = 20.700000, Support = 8.200000
+  Part 5: 8.000000 x 3.000000 x 4.000000, Vol = 50.000000, Support = 9.000000
+  Part 6: 8.000000 x 3.000000 x 4.000000, Vol = 50.000000, Support = 9.000000
+  Part 7: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 8: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 9: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 10: 6.000000 x 3.000000 x 1.000000, Vol = 15.000000, Support = 3.200000
+  Part 11: 5.000000 x 4.800000 x 5.000000, Vol = 90.000000, Support = 13.000000
+  Part 12: 2.500000 x 2.000000 x 3.800000, Vol = 10.500000, Support = 2.000000
+  Part 13: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 14: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 15: 8.000000 x 8.000000 x 8.000000, Vol = 340.000000, Support = 160.000000
+  Part 16: 8.000000 x 8.000000 x 8.000000, Vol = 340.000000, Support = 160.000000
+  Part 17: 18.000000 x 4.200000 x 5.000000, Vol = 100.000000, Support = 12.000000
+  Part 18: 5.000000 x 2.500000 x 3.000000, Vol = 14.000000, Support = 1.500000
+  Part 19: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 20: 6.000000 x 1.400000 x 2.000000, Vol = 15.000000, Support = 8.000000
+  Part 21: 5.000000 x 4.000000 x 7.500000, Vol = 62.000000, Support = 16.000000
+  Part 22: 5.000000 x 5.500000 x 6.000000, Vol = 80.000000, Support = 5.000000
+  Part 23: 16.700000 x 16.700000 x 10.700000, Vol = 173.600000, Support = 13.600000
+  Part 24: 4.300000 x 5.000000 x 5.000000, Vol = 85.000000, Support = 16.000000
+  Part 25: 7.000000 x 6.000000 x 1.800000, Vol = 50.000000, Support = 0.000000
+  Part 26: 7.000000 x 6.000000 x 1.800000, Vol = 50.000000, Support = 0.000000
+  Part 27: 6.250000 x 6.250000 x 4.000000, Vol = 9.600000, Support = 0.700000
+  Part 28: 7.000000 x 7.000000 x 3.000000, Vol = 60.000000, Support = 15.000000
+  Part 29: 7.000000 x 7.000000 x 3.000000, Vol = 60.000000, Support = 15.000000
+  Part 30: 7.500000 x 7.500000 x 4.500000, Vol = 78.600000, Support = 10.800000
+  Part 31: 5.000000 x 5.000000 x 2.000000, Vol = 13.700000, Support = 6.200000
+  Part 32: 5.000000 x 5.000000 x 2.000000, Vol = 13.700000, Support = 6.200000
+  Part 33: 5.000000 x 4.000000 x 7.600000, Vol = 98.000000, Support = 11.000000
+  Part 34: 5.000000 x 4.000000 x 7.600000, Vol = 98.000000, Support = 11.000000
+  Part 35: 7.000000 x 7.000000 x 2.400000, Vol = 60.000000, Support = 5.600000
+  Part 36: 7.000000 x 7.000000 x 2.400000, Vol = 60.000000, Support = 5.600000
+  Part 37: 4.590000 x 7.300000 x 1.500000, Vol = 40.000000, Support = 0.000000
+  Part 38: 10.000000 x 10.000000 x 6.000000, Vol = 200.000000, Support = 20.000000
+  Part 39: 10.000000 x 10.000000 x 6.000000, Vol = 200.000000, Support = 20.000000
+  Part 40: 5.000000 x 2.500000 x 3.000000, Vol = 15.000000, Support = 2.300000
+  Part 41: 5.000000 x 5.000000 x 2.700000, Vol = 22.400000, Support = 8.200000
+  Part 42: 6.000000 x 3.000000 x 33.000000, Vol = 200.000000, Support = 0.000000
+  Part 43: 8.400000 x 8.400000 x 2.880000, Vol = 103.680000, Support = 9.700000
+  Part 44: 8.400000 x 8.400000 x 2.880000, Vol = 103.680000, Support = 9.700000
+  Part 45: 5.000000 x 5.000000 x 3.000000, Vol = 23.300000, Support = 3.200000
+  Part 46: 3.000000 x 4.590000 x 38.000000, Vol = 216.000000, Support = 26.000000
+  Part 47: 3.000000 x 4.590000 x 38.000000, Vol = 216.000000, Support = 26.000000
+  Part 48: 5.000000 x 4.000000 x 7.500000, Vol = 50.000000, Support = 4.000000
+  Part 49: 5.000000 x 4.000000 x 7.500000, Vol = 50.000000, Support = 4.000000
+
+Single-machine EDD initial Total Tardiness (info only): 4139.292212
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 4
+
+TRACE t=1084.8 ub=52.8077 lb=0 gap=100.00 nodes=0
+TRACE t=1094.9 ub=52.8077 lb=0 gap=100.00 nodes=1026
+TRACE t=1105.3 ub=52.8077 lb=0 gap=100.00 nodes=2050
+TRACE t=1115.8 ub=52.8077 lb=0 gap=100.00 nodes=2954
+TRACE t=1126.0 ub=52.8077 lb=0 gap=100.00 nodes=4630
+TRACE t=1136.0 ub=52.8077 lb=0 gap=100.00 nodes=6214
+TRACE t=1146.2 ub=52.8077 lb=0 gap=100.00 nodes=7782
+TRACE t=1156.2 ub=52.8077 lb=0 gap=100.00 nodes=8842
+TRACE t=1166.3 ub=52.8077 lb=0 gap=100.00 nodes=10782
+TRACE t=1176.5 ub=52.8077 lb=0 gap=100.00 nodes=13322
+TRACE t=1186.9 ub=52.8077 lb=0 gap=100.00 nodes=13874
+TRACE t=1197.2 ub=52.8077 lb=0 gap=100.00 nodes=15194
+TRACE t=1207.3 ub=52.8077 lb=0 gap=100.00 nodes=17070
+TRACE t=1217.3 ub=52.8077 lb=0 gap=100.00 nodes=42062
+TRACE t=1227.3 ub=52.8077 lb=0 gap=100.00 nodes=68406
+TRACE t=1237.3 ub=52.8077 lb=0 gap=100.00 nodes=70750
+TRACE t=1247.5 ub=52.8077 lb=0 gap=100.00 nodes=73334
+TRACE t=1257.6 ub=52.8077 lb=0 gap=100.00 nodes=77142
+TRACE t=1267.6 ub=52.8077 lb=0 gap=100.00 nodes=193874
+TRACE t=1278.2 ub=52.8077 lb=0 gap=100.00 nodes=195818
+TRACE t=1288.3 ub=52.8077 lb=0 gap=100.00 nodes=196914
+TRACE t=1298.5 ub=52.8077 lb=0 gap=100.00 nodes=198562
+TRACE t=1308.7 ub=52.8077 lb=0 gap=100.00 nodes=241738
+TRACE t=1318.7 ub=52.8077 lb=0 gap=100.00 nodes=243234
+TRACE t=1328.7 ub=52.8077 lb=0 gap=100.00 nodes=243806
+TRACE t=1338.8 ub=52.8077 lb=0 gap=100.00 nodes=255110
+TRACE t=1348.9 ub=52.8077 lb=0 gap=100.00 nodes=257226
+TRACE t=1359.0 ub=52.8077 lb=0 gap=100.00 nodes=260730
+TRACE t=1369.0 ub=52.8077 lb=0 gap=100.00 nodes=262214
+TRACE t=1379.1 ub=52.8077 lb=0 gap=100.00 nodes=265182
+TRACE t=1389.1 ub=52.8077 lb=0 gap=100.00 nodes=267342
+TRACE t=1399.1 ub=52.8077 lb=0 gap=100.00 nodes=347734
+TRACE t=1409.1 ub=52.8077 lb=0 gap=100.00 nodes=496926
+TRACE t=1438.6 ub=52.8077 lb=0 gap=100.00 nodes=564278
+TRACE t=1472.2 ub=52.8077 lb=0 gap=100.00 nodes=564338
+TRACE t=1496.1 ub=52.8077 lb=0 gap=100.00 nodes=564354
+TRACE t=1522.4 ub=52.8077 lb=0 gap=100.00 nodes=564362
+TRACE t=1556.0 ub=52.8077 lb=0 gap=100.00 nodes=564810
+TRACE t=1582.1 ub=52.8077 lb=0 gap=100.00 nodes=564826
+TRACE t=1611.3 ub=52.8077 lb=0 gap=100.00 nodes=564830
+TRACE t=1621.3 ub=52.8077 lb=0 gap=100.00 nodes=564846
+TRACE t=1646.5 ub=52.8077 lb=0 gap=100.00 nodes=564846
+TRACE t=1671.5 ub=52.8077 lb=0 gap=100.00 nodes=564854
+TRACE t=1710.8 ub=52.8077 lb=0 gap=100.00 nodes=564866
+TRACE t=1723.1 ub=52.8077 lb=0 gap=100.00 nodes=564870
+TRACE t=1733.5 ub=52.8077 lb=0 gap=100.00 nodes=596414
+TRACE t=1743.9 ub=52.8077 lb=0 gap=100.00 nodes=642102
+TRACE t=1754.2 ub=52.8077 lb=0 gap=100.00 nodes=681830
+TRACE t=1764.2 ub=52.8077 lb=0 gap=100.00 nodes=684050
+TRACE t=1774.3 ub=52.8077 lb=0 gap=100.00 nodes=721118
+TRACE t=1784.3 ub=52.8077 lb=0 gap=100.00 nodes=725038
+TRACE t=1794.4 ub=52.8077 lb=0 gap=100.00 nodes=728214
+TRACE t=1804.6 ub=52.8077 lb=0 gap=100.00 nodes=728566
+TRACE t=1814.7 ub=52.8077 lb=0 gap=100.00 nodes=728934
+TRACE t=1824.8 ub=52.8077 lb=0 gap=100.00 nodes=730158
+TRACE t=1834.8 ub=52.8077 lb=0 gap=100.00 nodes=820958
+TRACE t=1844.9 ub=52.8077 lb=0 gap=100.00 nodes=896390
+TRACE t=1855.5 ub=52.8077 lb=0 gap=100.00 nodes=901002
+TRACE t=1866.2 ub=52.8077 lb=0 gap=100.00 nodes=903850
+TRACE t=1876.4 ub=52.8077 lb=0 gap=100.00 nodes=905562
+TRACE t=1886.4 ub=52.8077 lb=0 gap=100.00 nodes=913574
+TRACE t=1896.4 ub=52.8077 lb=0 gap=100.00 nodes=917690
+TRACE t=1907.1 ub=52.8077 lb=0 gap=100.00 nodes=918254
+TRACE t=1917.3 ub=52.8077 lb=0 gap=100.00 nodes=925086
+TRACE t=1927.7 ub=52.8077 lb=0 gap=100.00 nodes=935150
+TRACE t=1938.0 ub=52.8077 lb=0 gap=100.00 nodes=938694
+TRACE t=1948.1 ub=52.8077 lb=0 gap=100.00 nodes=943330
+TRACE t=1958.1 ub=52.8077 lb=0 gap=100.00 nodes=959422
+TRACE t=1968.1 ub=52.8077 lb=0 gap=100.00 nodes=986498
+TRACE t=1979.5 ub=52.8077 lb=0 gap=100.00 nodes=988514
+TRACE t=1989.5 ub=52.8077 lb=0 gap=100.00 nodes=988698
+TRACE t=2001.2 ub=52.8077 lb=0 gap=100.00 nodes=989554
+TRACE t=2011.4 ub=52.8077 lb=0 gap=100.00 nodes=990846
+TRACE t=2022.7 ub=52.8077 lb=0 gap=100.00 nodes=991838
+TRACE t=2033.3 ub=52.8077 lb=0 gap=100.00 nodes=1070158
+TRACE t=2043.3 ub=52.8077 lb=0 gap=100.00 nodes=1079818
+TRACE t=2057.1 ub=52.8077 lb=0 gap=100.00 nodes=1079870
+TRACE t=2067.6 ub=52.8077 lb=0 gap=100.00 nodes=1079910
+TRACE t=2078.0 ub=52.8077 lb=0 gap=100.00 nodes=1080126
+TRACE t=2088.0 ub=52.8077 lb=0 gap=100.00 nodes=1080374
+TRACE t=2098.0 ub=52.8077 lb=0 gap=100.00 nodes=1082318
+TRACE t=2108.1 ub=52.8077 lb=0 gap=100.00 nodes=1083682
+TRACE t=2118.3 ub=52.8077 lb=0 gap=100.00 nodes=1085062
+TRACE t=2128.7 ub=52.8077 lb=0 gap=100.00 nodes=1085670
+TRACE t=2138.7 ub=52.8077 lb=0 gap=100.00 nodes=1086762
+TRACE t=2148.8 ub=52.8077 lb=0 gap=100.00 nodes=1087158
+TRACE t=2158.9 ub=52.8077 lb=0 gap=100.00 nodes=1087678
+TRACE t=2169.3 ub=52.8077 lb=0 gap=100.00 nodes=1088466
+TRACE t=2179.6 ub=52.8077 lb=0 gap=100.00 nodes=1089198
+TRACE t=2190.1 ub=52.8077 lb=0 gap=100.00 nodes=1093718
+TRACE t=2200.1 ub=52.8077 lb=0 gap=100.00 nodes=1103350
+TRACE t=2210.3 ub=52.8077 lb=0 gap=100.00 nodes=1128578
+TRACE t=2220.3 ub=52.8077 lb=0 gap=100.00 nodes=1140586
+TRACE t=2231.4 ub=52.8077 lb=0 gap=100.00 nodes=1164610
+TRACE t=2242.8 ub=52.8077 lb=0 gap=100.00 nodes=1164638
+TRACE t=2255.0 ub=52.8077 lb=0 gap=100.00 nodes=1164734
+TRACE t=2265.8 ub=52.8077 lb=0 gap=100.00 nodes=1170706
+TRACE t=2276.1 ub=52.8077 lb=0 gap=100.00 nodes=1170962
+TRACE t=2286.3 ub=52.8077 lb=0 gap=100.00 nodes=1171082
+TRACE t=2296.4 ub=52.8077 lb=0 gap=100.00 nodes=1171286
+TRACE t=2306.4 ub=52.8077 lb=0 gap=100.00 nodes=1172850
+TRACE t=2316.6 ub=52.8077 lb=0 gap=100.00 nodes=1172902
+TRACE t=2328.9 ub=52.8077 lb=0 gap=100.00 nodes=1173174
+TRACE t=2338.9 ub=52.8077 lb=0 gap=100.00 nodes=1203214
+TRACE t=2348.9 ub=52.8077 lb=0 gap=100.00 nodes=1279266
+TRACE t=2358.9 ub=52.8077 lb=0 gap=100.00 nodes=1323842
+TRACE t=2368.9 ub=52.8077 lb=0 gap=100.00 nodes=1398698
+TRACE t=2378.9 ub=52.8077 lb=0 gap=100.00 nodes=1466882
+TRACE t=2388.9 ub=52.8077 lb=0 gap=100.00 nodes=1540254
+TRACE t=2398.9 ub=52.8077 lb=0 gap=100.00 nodes=1608382
+TRACE t=2408.9 ub=52.8077 lb=0 gap=100.00 nodes=1682694
+TRACE t=2418.9 ub=52.8077 lb=0 gap=100.00 nodes=1757294
+TRACE t=2428.9 ub=52.8077 lb=0 gap=100.00 nodes=1832602
+TRACE t=2438.9 ub=52.8077 lb=0 gap=100.00 nodes=1907598
+TRACE t=2448.9 ub=52.8077 lb=0 gap=100.00 nodes=1983346
+TRACE t=2458.9 ub=52.8077 lb=0 gap=100.00 nodes=2060702
+TRACE t=2468.9 ub=52.8077 lb=0 gap=100.00 nodes=2135730
+TRACE t=2478.9 ub=52.8077 lb=0 gap=100.00 nodes=2209390
+TRACE t=2489.0 ub=52.8077 lb=0 gap=100.00 nodes=2271970
+TRACE t=2499.0 ub=52.8077 lb=0 gap=100.00 nodes=2341534
+TRACE t=2509.0 ub=52.8077 lb=0 gap=100.00 nodes=2412470
+TRACE t=2519.0 ub=52.8077 lb=0 gap=100.00 nodes=2486958
+TRACE t=2529.0 ub=52.8077 lb=0 gap=100.00 nodes=2562042
+TRACE t=2539.0 ub=52.8077 lb=0 gap=100.00 nodes=2639282
+TRACE t=2549.0 ub=52.8077 lb=0 gap=100.00 nodes=2714490
+TRACE t=2559.0 ub=52.8077 lb=0 gap=100.00 nodes=2790506
+TRACE t=2569.0 ub=52.8077 lb=0 gap=100.00 nodes=2868542
+TRACE t=2579.0 ub=52.8077 lb=0 gap=100.00 nodes=2943558
+TRACE t=2589.1 ub=52.8077 lb=0 gap=100.00 nodes=2976018
+TRACE t=2599.2 ub=52.8077 lb=0 gap=100.00 nodes=2978422
+TRACE t=2609.2 ub=52.8077 lb=0 gap=100.00 nodes=2987538
+TRACE t=2619.5 ub=52.8077 lb=0 gap=100.00 nodes=2996754
+TRACE t=2629.7 ub=52.8077 lb=0 gap=100.00 nodes=2997698
+TRACE t=2639.7 ub=52.8077 lb=0 gap=100.00 nodes=2997838
+TRACE t=2650.2 ub=52.8077 lb=0 gap=100.00 nodes=2998118
+TRACE t=2660.9 ub=52.8077 lb=0 gap=100.00 nodes=2998270
+TRACE t=2670.9 ub=52.8077 lb=0 gap=100.00 nodes=3015250
+TRACE t=2680.9 ub=52.8077 lb=0 gap=100.00 nodes=3050862
+TRACE t=2691.2 ub=52.8077 lb=0 gap=100.00 nodes=3053966
+TRACE t=2701.2 ub=52.8077 lb=0 gap=100.00 nodes=3117698
+TRACE t=2711.3 ub=52.8077 lb=0 gap=100.00 nodes=3172618
+TRACE t=2733.5 ub=52.8077 lb=0 gap=100.00 nodes=3203642
+TRACE t=2753.4 ub=52.8077 lb=0 gap=100.00 nodes=3203654
+TRACE t=2763.5 ub=52.8077 lb=0 gap=100.00 nodes=3203658
+TRACE t=2773.5 ub=52.8077 lb=0 gap=100.00 nodes=3268390
+TRACE t=2783.5 ub=52.8077 lb=0 gap=100.00 nodes=3333306
+TRACE t=2793.5 ub=52.8077 lb=0 gap=100.00 nodes=3400310
+TRACE t=2803.5 ub=52.8077 lb=0 gap=100.00 nodes=3469122
+TRACE t=2813.5 ub=52.8077 lb=0 gap=100.00 nodes=3541510
+TRACE t=2823.5 ub=52.8077 lb=0 gap=100.00 nodes=3609118
+TRACE t=2833.5 ub=52.8077 lb=0 gap=100.00 nodes=3682762
+TRACE t=2843.5 ub=52.8077 lb=0 gap=100.00 nodes=3770882
+TRACE t=2853.5 ub=52.8077 lb=0 gap=100.00 nodes=3863286
+TRACE t=2863.5 ub=52.8077 lb=0 gap=100.00 nodes=3931590
+TRACE t=2883.9 ub=52.8077 lb=0 gap=100.00 nodes=3956130
+TRACE t=2898.3 ub=52.8077 lb=0 gap=100.00 nodes=3956134
+TRACE t=2912.1 ub=52.8077 lb=0 gap=100.00 nodes=3956142
+TRACE t=2926.9 ub=52.8077 lb=0 gap=100.00 nodes=3956158
+TRACE t=2943.6 ub=52.8077 lb=0 gap=100.00 nodes=3956318
+TRACE t=2958.9 ub=52.8077 lb=0 gap=100.00 nodes=3956326
+TRACE t=2974.7 ub=52.8077 lb=0 gap=100.00 nodes=3956370
+TRACE t=2991.2 ub=52.8077 lb=0 gap=100.00 nodes=3956706
+TRACE t=3007.0 ub=52.8077 lb=0 gap=100.00 nodes=3956710
+TRACE t=3026.9 ub=52.8077 lb=0 gap=100.00 nodes=3956718
+TRACE t=3045.2 ub=52.8077 lb=0 gap=100.00 nodes=3956734
+TRACE t=3064.9 ub=52.8077 lb=0 gap=100.00 nodes=3956774
+TRACE t=3076.2 ub=52.8077 lb=0 gap=100.00 nodes=4001826
+TRACE t=3086.3 ub=52.8077 lb=0 gap=100.00 nodes=4002058
+TRACE t=3096.5 ub=52.8077 lb=0 gap=100.00 nodes=4022214
+TRACE t=3106.6 ub=52.8077 lb=0 gap=100.00 nodes=4023166
+TRACE t=3116.6 ub=52.8077 lb=0 gap=100.00 nodes=4067170
+TRACE t=3126.6 ub=52.8077 lb=0 gap=100.00 nodes=4129006
+TRACE t=3136.6 ub=52.8077 lb=0 gap=100.00 nodes=4194102
+TRACE t=3146.6 ub=52.8077 lb=0 gap=100.00 nodes=4258586
+TRACE t=3156.6 ub=52.8077 lb=0 gap=100.00 nodes=4321590
+TRACE t=3166.6 ub=52.8077 lb=0 gap=100.00 nodes=4372262
+TRACE t=3176.6 ub=52.8077 lb=0 gap=100.00 nodes=4433358
+TRACE t=3186.7 ub=52.8077 lb=0 gap=100.00 nodes=4500074
+TRACE t=3196.7 ub=52.8077 lb=0 gap=100.00 nodes=4577834
+TRACE t=3206.7 ub=52.8077 lb=0 gap=100.00 nodes=4642374
+TRACE t=3217.1 ub=52.8077 lb=0 gap=100.00 nodes=4696118
+TRACE t=3227.1 ub=52.8077 lb=0 gap=100.00 nodes=4743918
+TRACE t=3237.1 ub=52.8077 lb=0 gap=100.00 nodes=4812362
+TRACE t=3247.1 ub=52.8077 lb=0 gap=100.00 nodes=4861430
+TRACE t=3267.9 ub=52.8077 lb=0 gap=100.00 nodes=4901334
+TRACE t=3282.0 ub=52.8077 lb=0 gap=100.00 nodes=4901338
+TRACE t=3301.9 ub=52.8077 lb=0 gap=100.00 nodes=4901414
+TRACE t=3316.6 ub=52.8077 lb=0 gap=100.00 nodes=4901418
+TRACE t=3336.1 ub=52.8077 lb=0 gap=100.00 nodes=4901522
+TRACE t=3351.1 ub=52.8077 lb=0 gap=100.00 nodes=4901526
+TRACE t=3371.5 ub=52.8077 lb=0 gap=100.00 nodes=4901978
+TRACE t=3386.0 ub=52.8077 lb=0 gap=100.00 nodes=4901982
+TRACE t=3403.8 ub=52.8077 lb=0 gap=100.00 nodes=4902010
+TRACE t=3418.6 ub=52.8077 lb=0 gap=100.00 nodes=4902014
+TRACE t=3437.5 ub=52.8077 lb=0 gap=100.00 nodes=4902174
+TRACE t=3452.3 ub=52.8077 lb=0 gap=100.00 nodes=4902178
+TRACE t=3469.9 ub=52.8077 lb=0 gap=100.00 nodes=4902194
+TRACE t=3483.6 ub=52.8077 lb=0 gap=100.00 nodes=4902198
+TRACE t=3501.6 ub=52.8077 lb=0 gap=100.00 nodes=4902206
+TRACE t=3524.9 ub=52.8077 lb=0 gap=100.00 nodes=4902234
+TRACE t=3539.1 ub=52.8077 lb=0 gap=100.00 nodes=4902238
+TRACE t=3555.3 ub=52.8077 lb=0 gap=100.00 nodes=4902254
+TRACE t=3568.0 ub=52.8077 lb=0 gap=100.00 nodes=4902258
+TRACE t=3584.8 ub=52.8077 lb=0 gap=100.00 nodes=4902266
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [2, 5, 10, 12, 15, 16, 25, 38, 40]  -> Phi = 16.243344
+  Machine 1 : [3, 6, 17, 20, 24, 27, 28, 32, 33, 36, 39, 41, 43, 44, 45, 48]  -> Phi = 7.461701
+  Machine 2 : [0, 8, 9, 11, 14, 18, 21, 26, 35, 37, 42, 46]  -> Phi = 16.226784
+  Machine 3 : [1, 4, 7, 13, 19, 22, 23, 29, 30, 31, 34, 47, 49]  -> Phi = 12.875827
+
+Total Tardiness (UB): 52.807656
+Proven optimal: no (time limit reached)
+
+============= Parallel Search Info =============
+nodes processed:      1234164
+nodes generated:      4902338
+leaf nodes evaluated: 8578
+incumbent updates:    0
+LB-pruned nodes:      3668070
+oracle calls:         4607
+oracle cache hits:    2864
+time:3600.387000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht2_1-50_0.3_0.3_1.txt n=50 M=4 TT=52.8077 optimal=0 time=3600.39 lb=0 gap=100 nodes=1234164 oracle=4607
+
+[stderr]
+[heavy] K=15 cap=2500 calls=7758 prunes=0

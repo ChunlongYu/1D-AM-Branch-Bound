@@ -1,0 +1,53 @@
+# experiment: ht1_1-10_0.6_0.6_3  M=3
+# config: HEAVY=1 diving=depth LS=1 ; TL=3600s traceint=10s
+# date: 2026-06-28T10:27:19  wall=0.0s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.700000
+  Setup time: 2.000000
+  Size: 25.000000 x 25.000000 x 32.500000
+
+Parts Summary:
+  Part 0: 7.500000 x 7.500000 x 5.000000, Vol = 27.500000, Support = 10.750000
+  Part 1: 6.000000 x 2.000000 x 28.000000, Vol = 130.000000, Support = 0.000000
+  Part 2: 6.000000 x 2.000000 x 28.000000, Vol = 130.000000, Support = 0.000000
+  Part 3: 8.000000 x 4.000000 x 6.000000, Vol = 50.000000, Support = 5.000000
+  Part 4: 8.000000 x 4.000000 x 6.000000, Vol = 50.000000, Support = 5.000000
+  Part 5: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 6: 7.000000 x 6.500000 x 2.000000, Vol = 45.000000, Support = 6.000000
+  Part 7: 8.000000 x 2.000000 x 5.000000, Vol = 46.000000, Support = 10.000000
+  Part 8: 8.000000 x 2.000000 x 5.000000, Vol = 46.000000, Support = 10.000000
+  Part 9: 4.300000 x 5.000000 x 5.000000, Vol = 72.000000, Support = 12.000000
+
+Single-machine EDD initial Total Tardiness (info only): 305.992560
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 3
+
+TRACE t=0.0 ub=53.6504 lb=33.711 gap=37.17 nodes=0
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [3, 4, 6, 8]  -> Phi = 16.412288
+  Machine 1 : [1, 2]  -> Phi = 31.249280
+  Machine 2 : [0, 5, 7, 9]  -> Phi = 3.194360
+
+Total Tardiness (UB): 50.855928
+Proven optimal: yes
+
+============= Parallel Search Info =============
+nodes processed:      1437
+nodes generated:      2761
+leaf nodes evaluated: 420
+incumbent updates:    3
+LB-pruned nodes:      1420
+oracle calls:         270
+oracle cache hits:    208
+time:0.014000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht1_1-10_0.6_0.6_3.txt n=10 M=3 TT=50.8559 optimal=1 time=0.0140015 lb=50.8559 gap=0 nodes=1437 oracle=270
+
+[stderr]
+[heavy] K=6 cap=100 calls=24 prunes=22

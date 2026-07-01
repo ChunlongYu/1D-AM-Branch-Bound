@@ -1,0 +1,382 @@
+\documentclass[review,3p,times,authoryear]{elsarticle}
+
+\biboptions{round,authoryear}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\parindent}{2em}
+
+\newtheorem{proposition}{Proposition}
+
+% shorthand
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\Om}{\Omega}
+\newcommand{\Mbar}{\bar{M}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\begin{document}
+
+\begin{frontmatter}
+\title{A Branch-and-Price Framework for Total-Tardiness Scheduling of\\
+Parallel Additive Manufacturing Machines}
+\begin{abstract}
+This note sketches a branch-and-price (column-generation) framework for the
+one-dimensional batch scheduling problem on identical parallel additive
+manufacturing (AM) machines with total-tardiness objective and the mix-batch
+processing-time model $P(B)=S+V\sum_{j\in B}v_j+U\max_{j\in B}h_j$. A
+Dantzig--Wolfe reformulation represents a solution as a selection of
+single-machine schedules (columns); the restricted master problem is a
+set-partitioning program over parts, and the pricing subproblem is a
+\emph{prize-collecting} single-machine batch total-tardiness problem that is
+solved by an extension of the exact single-machine oracle already available in
+the assignment-based branch-and-bound. The reformulation is motivated by the
+empirical finding that the bottleneck of the compact model and of the
+assignment-based search is the weakness of the lower bound; the Dantzig--Wolfe
+master provides a substantially stronger convexification bound. We give the
+master and pricing formulations, a Ryan--Foster branching rule compatible with
+pricing, the overall algorithm, and implementation notes.
+\end{abstract}
+\begin{keyword}
+Additive manufacturing \sep Parallel machine scheduling \sep Batch scheduling
+\sep Total tardiness \sep Branch-and-price \sep Column generation
+\end{keyword}
+\end{frontmatter}
+
+%====================================================================
+\section{Motivation and notation}
+\label{sec:bp_motivation}
+
+The assignment-based branch-and-bound of the main paper branches on the
+assignment of parts to machines and evaluates each complete assignment by
+solving independent single-machine subproblems with an exact oracle $\Phi$. Its
+empirical limit is the lower bound: cheap analytical bounds collapse on
+congested machines, so for $n\gtrsim 20$ the global bound stays far below the
+optimum and the search cannot close the gap by enumeration alone. This motivates
+a Dantzig--Wolfe reformulation, whose master linear program yields the
+convexification bound---typically much tighter than the compact
+linear-programming relaxation---and whose pricing subproblem reuses the existing
+single-machine oracle. The resulting branch-and-price (B\&P) attacks precisely
+the lower-bound bottleneck \citep{barnhart1998,desaulniers2005}.
+
+We keep the notation of the main paper. A set of parts $\J=\{1,\dots,n\}$ is to
+be produced on $\Mbar$ identical AM machines. Each part $j$ has due date $d_j$,
+volume $v_j$, height $h_j$, and footprint area $a_j$. A \emph{batch} $B$ is a
+subset of parts printed together; it is area-feasible if $\sum_{j\in B}a_j\le A$
+with $A=LW$ the platform area, and its processing time is the mix-batch model
+\begin{equation}
+P(B)=S+V\sum_{j\in B}v_j+U\max_{j\in B}h_j .
+\label{eq:bp_batchtime}
+\end{equation}
+On a single machine a schedule is a sequence of area-feasible batches; a part's
+completion time is the completion of its batch, and its tardiness is
+$T_j=\max(0,C_j-d_j)$. The single-machine oracle $\Phi(\mathcal{S})$ returns the
+minimum total tardiness $\sum_{j\in\mathcal{S}}T_j$ of an arbitrary part set
+$\mathcal{S}\subseteq\J$, scheduled optimally on one machine.
+
+%====================================================================
+\section{Set-partitioning master problem}
+\label{sec:bp_master}
+
+\paragraph{Columns.} A \emph{column} (or \emph{machine schedule}) $p$ is a
+feasible single-machine schedule: an ordered set of area-feasible batches that
+partition a part set $\J_p\subseteq\J$. Its cost is its single-machine total
+tardiness
+\begin{equation}
+c_p=\sum_{j\in\J_p}\max\!\bigl(0,\,C^{p}_{j}-d_j\bigr),
+\label{eq:bp_colcost}
+\end{equation}
+where $C^p_j$ is the completion time of part $j$ in schedule $p$. Let
+$a_{jp}=1$ if $j\in\J_p$ and $0$ otherwise, and let $\Om$ be the set of all
+feasible columns, augmented with the empty schedule $p_0$ ($\J_{p_0}=\emptyset$,
+$c_{p_0}=0$) that represents an idle machine.
+
+\paragraph{Master.} With binary variables $x_p$ indicating whether column $p$ is
+used, the integer master is
+\begin{subequations}\label{eq:bp_master}
+\begin{align}
+\min\quad & \sum_{p\in\Om} c_p\,x_p \label{eq:bp_obj}\\
+\text{s.t.}\quad
+& \sum_{p\in\Om} a_{jp}\,x_p = 1, && \forall j\in\J, \label{eq:bp_partition}\\
+& \sum_{p\in\Om} x_p \le \Mbar, && \label{eq:bp_machines}\\
+& x_p\in\{0,1\}, && \forall p\in\Om. \label{eq:bp_binary}
+\end{align}
+\end{subequations}
+Constraints \eqref{eq:bp_partition} assign every part to exactly one machine
+schedule, and \eqref{eq:bp_machines} uses at most $\Mbar$ machines. Because the
+machines are identical, columns are not indexed by machine: a single pool of
+schedules is shared, which removes the symmetry that burdens the compact model.
+The linear relaxation of \eqref{eq:bp_master}, denoted the \emph{master LP},
+provides the Dantzig--Wolfe bound.
+
+\paragraph{Restricted master.} Since $|\Om|$ is exponential, we solve the master
+LP by column generation over a restricted set $\Om'\subseteq\Om$ (the
+\emph{restricted master problem}, RMP). Let $\pi_j\in\mathbb{R}$ be the dual of
+\eqref{eq:bp_partition} and $\sigma\le 0$ the dual of \eqref{eq:bp_machines}. A
+column $p$ has reduced cost
+\begin{equation}
+\bar c_p \;=\; c_p-\sum_{j\in\J_p}\pi_j-\sigma .
+\label{eq:bp_redcost}
+\end{equation}
+The RMP is optimal for the full master LP when no column has $\bar c_p<0$.
+
+%====================================================================
+\section{Pricing subproblem}
+\label{sec:bp_pricing}
+
+Finding a most-negative-reduced-cost column requires
+\begin{equation}
+\bar c^\star=\min_{p\in\Om}\bar c_p
+=\Bigl(\min_{\mathcal{S}\subseteq\J}\;\Phi(\mathcal{S})-\sum_{j\in\mathcal{S}}\pi_j\Bigr)-\sigma .
+\label{eq:bp_pricing}
+\end{equation}
+The inner minimization in \eqref{eq:bp_pricing} holds because, for a fixed part
+set $\mathcal{S}$, the cheapest schedule of $\mathcal{S}$ has total tardiness
+$\Phi(\mathcal{S})$ and the prize term $\sum_{j\in\mathcal{S}}\pi_j$ is
+schedule-independent. The pricing problem is therefore a
+\emph{prize-collecting single-machine batch total-tardiness} problem: choose a
+part subset and its optimal single-machine schedule to minimize total tardiness
+minus the prizes $\pi_j$ collected by the included parts. If $\bar c^\star<0$ the
+corresponding schedule is added to the RMP; otherwise the master LP is solved to
+optimality.
+
+\paragraph{Reusing the oracle.} The pricing problem is exactly the single-machine
+problem solved by $\Phi$, with two extensions: (i) parts are \emph{optional}, and
+(ii) including part $j$ credits a reward $\pi_j$. Concretely, define the
+prize-collecting objective on a candidate schedule as
+$\sum_{j\in\mathcal{S}}\bigl(T_j-\pi_j\bigr)$, with $T_j-\pi_j<0$ making part $j$
+attractive. The oracle's batch-position branch-and-bound is adapted as follows.
+\begin{itemize}
+\item \emph{Optional parts.} At each node a part may be (a) placed in the current
+or a later batch, or (b) discarded. Discarding $j$ contributes $0$ (neither
+tardiness nor prize).
+\item \emph{Bounding.} Any valid lower bound on the residual tardiness of the
+still-schedulable parts, minus the sum of the still-collectable positive prizes
+$\sum_{j\ \text{free}}\max(0,\pi_j)$ (an optimistic credit), is a valid lower
+bound on the prize-collecting objective; the existing parallel and positional
+tardiness bounds of $\Phi$ are reused for the first term.
+\item \emph{Dominance and memoization} carry over unchanged, since the schedule
+structure (area-feasible batches, processing time \eqref{eq:bp_batchtime}) is
+identical.
+\end{itemize}
+Because $\mathcal{S}=\emptyset$ yields objective $0$, we always have
+$\bar c^\star\le-\sigma$, consistent with $\sigma\le 0$. In practice a fast
+heuristic pricer (e.g.\ a greedy prize-collecting insertion) is run first, and
+the exact oracle-based pricer is invoked only to add further columns or to prove
+that none has negative reduced cost.
+
+%====================================================================
+\section{Branching}
+\label{sec:bp_branching}
+
+Branching on the master variables $x_p$ is incompatible with pricing, because
+fixing $x_p=0$ cannot be expressed in the subproblem. We use the Ryan--Foster
+rule \citep{ryan1981}, which branches on a pair of parts. Let
+$y_{jj'}=\sum_{p:\,j,j'\in\J_p}x_p$ be the (fractional) frequency with which
+parts $j$ and $j'$ share a machine schedule in the master LP solution. If some
+$y_{jj'}$ is fractional, create two children:
+\begin{description}
+\item[\textnormal{\emph{together}}] parts $j,j'$ must be on the same machine
+schedule ($y_{jj'}=1$); in pricing, $j$ and $j'$ are forced to be included
+jointly (either both or neither);
+\item[\textnormal{\emph{apart}}] parts $j,j'$ must be on different machine
+schedules ($y_{jj'}=0$); in pricing, columns containing both $j$ and $j'$ are
+forbidden.
+\end{description}
+Both restrictions are easily enforced in the prize-collecting oracle (merge the
+two parts, or add an incompatibility), and columns of the current RMP that
+violate the branching decision are removed. The rule partitions the solution
+space completely and preserves the exactness of column generation at every node.
+
+%====================================================================
+\section{Overall algorithm}
+\label{sec:bp_algorithm}
+
+Algorithm~\ref{alg:bp} states the branch-and-price procedure. The incumbent and
+the initial column pool are seeded by the constructive-plus-local-search
+heuristic of the main paper: each machine's schedule in the heuristic solution is
+a feasible column, which gives an immediately feasible RMP and a strong starting
+upper bound.
+
+\begin{algorithm}[H]
+\caption{Branch-and-price for parallel-AM total tardiness}
+\label{alg:bp}
+\begin{algorithmic}[1]
+\State seed $\Om'$ with the heuristic machine schedules and the empty column $p_0$
+\State $z^\ast\gets$ heuristic objective; incumbent $\gets$ heuristic solution
+\State initialise node list with the root (no branching decisions)
+\While{node list non-empty}
+  \State pop a node (best-bound or depth-first)
+  \Repeat \Comment{column generation at this node}
+    \State solve the RMP LP $\to$ duals $\pi,\sigma$ and value $z_{\mathrm{LP}}$
+    \State solve pricing \eqref{eq:bp_pricing} under the node's branching decisions
+    \If{$\bar c^\star<-\epsilon$} add the priced column(s) to $\Om'$ \EndIf
+  \Until{$\bar c^\star \ge -\epsilon$}
+  \State node bound $\gets \lceil z_{\mathrm{LP}}\rceil$ if integral data, else $z_{\mathrm{LP}}$
+  \If{node bound $\ge z^\ast$} \textbf{prune}
+  \ElsIf{RMP solution is integral}
+     \State update incumbent and $z^\ast$
+  \Else
+     \State select fractional pair $(j,j')$; create \emph{together} and \emph{apart} children
+  \EndIf
+\EndWhile
+\State \Return incumbent, $z^\ast$
+\end{algorithmic}
+\end{algorithm}
+
+The master LP value at the root is a valid lower bound on the optimal total
+tardiness; the global lower bound during the search is the minimum node bound
+over the open nodes, and the algorithm terminates with a proven optimum when the
+list empties.
+
+%====================================================================
+\section{Implementation notes}
+\label{sec:bp_notes}
+
+\paragraph{Dual stabilisation.} Set-partitioning masters are highly degenerate
+and column generation is prone to slow tail convergence and unstable duals. A
+stabilised column generation \citep{desrosiers2005}---e.g.\ a bounded-perturbation
+or piecewise-linear penalty around a dual centre, or an in-out/interior-point
+dual---is recommended and is usually decisive for performance.
+
+\paragraph{Heuristic pricing and column management.} A greedy prize-collecting
+pricer supplies negative-reduced-cost columns cheaply; the exact oracle pricer is
+called only when the heuristic fails, both to add columns and to certify
+optimality of the master LP. A column pool with periodic purging of long-inactive
+columns keeps the RMP small.
+
+\paragraph{Branching and search order.} Ryan--Foster pairs are chosen as the most
+fractional $y_{jj'}$ closest to $0.5$, or by a strong-branching estimate. A
+depth-first order reaches integer incumbents quickly and bounds the number of open
+nodes, mirroring the diving rule validated for the assignment-based search.
+
+\paragraph{Relation to existing methods.} The proposed B\&P differs from the
+logic-based Benders decomposition used for the p-batch nesting-and-scheduling
+problem \citep{nascimento2024}, which decomposes scheduling (master) from packing
+feasibility (subproblem). Here the decomposition is by machine: a Dantzig--Wolfe
+reformulation whose subproblem is a single-machine \emph{scheduling} oracle. The
+two are complementary, and the present route directly targets the weak
+mix-batch tardiness bound identified empirically for the parallel problem.
+
+%====================================================================
+\section{Retrofitting the single-machine oracle into a pricer}
+\label{sec:bp_retrofit}
+
+The pricing problem \eqref{eq:bp_pricing} is solved by the existing
+batch-position branch-and-bound for $\Phi$ with the following localized changes.
+Throughout, $\pi_j$ are the dual prizes and a column's value is the
+single-machine tardiness minus the prizes collected by its parts.
+
+\paragraph{(0) Candidate reduction.} The equality duals $\pi_j$ are free in sign.
+A part with $\pi_j\le 0$ is never beneficial, since including it contributes
+$T_j-\pi_j\ge 0$. Restrict the pricer to the candidate set
+$\mathcal{C}=\{j:\pi_j>0\}$ and discard the rest a priori; this typically shrinks
+the subproblem sharply, because most duals are non-positive at a given iteration.
+
+\paragraph{(1) Optional parts (branching).} The original oracle schedules a fixed
+part set; the pricer also chooses the subset. Add a \emph{discard} option to the
+branching of each free candidate $j$: at a node, $j$ may be placed in the current
+open batch, may start a new batch, or may be \emph{excluded}. The Type-I/II
+symmetry breaking is retained for the two placement options; the discard option is
+taken at most once per part and is independent of the $j>o_{\max}$ rule.
+
+\paragraph{(2) Node objective.} The value of a (partial or complete) schedule with
+included set $\mathcal{S}$ is
+\[
+\sum_{j\in\mathcal{S}}\bigl(T_j-\pi_j\bigr)
+=\underbrace{\textstyle\sum_{j\in\mathcal{S}}T_j}_{\text{as before}}
+-\sum_{j\in\mathcal{S}}\pi_j ,
+\]
+where the first term is computed exactly as in $\Phi$ and the prize sum is
+accumulated incrementally as parts are committed. The empty schedule has value
+$0$, which seeds the incumbent and guarantees the optimum is $\le 0$.
+
+\paragraph{(3) Lower bound.} Consider a node whose committed prefix has
+exact-or-bounded tardiness $\underline{T}_{\mathrm{com}}$ over the committed parts
+$\mathcal{S}_{\mathrm{com}}$, and let $\mathcal{F}\subseteq\mathcal{C}$ be the
+free candidates. A valid lower bound on the node's prize-collecting objective is
+\begin{equation}
+\mathrm{LB}_{\mathrm{pc}}=
+\Bigl(\underline{T}_{\mathrm{com}}-\!\!\sum_{j\in\mathcal{S}_{\mathrm{com}}}\!\!\pi_j\Bigr)
++\sum_{j\in\mathcal{F}}\min\!\bigl(0,\ \underline{t}_j-\pi_j\bigr),
+\label{eq:bp_pricelb}
+\end{equation}
+where $\underline{t}_j\ge 0$ is any valid lower bound on the tardiness part $j$
+would incur if appended to the committed prefix (e.g.\
+$\underline{t}_j=\max(0,\tau+P_{\min}-d_j)$, with $\tau$ the committed completion
+time and $P_{\min}$ the smallest added batch time). The term
+$\min(0,\underline{t}_j-\pi_j)$ is the most optimistic contribution of an optional
+part; setting $\underline{t}_j=0$ recovers the cheaper credit
+$-\sum_{j\in\mathcal{F}}\pi_j$.
+
+\begin{proposition}
+The quantity $\mathrm{LB}_{\mathrm{pc}}$ in \eqref{eq:bp_pricelb} is a valid lower
+bound on the prize-collecting objective of every completion of the node.
+\end{proposition}
+\noindent The committed parts contribute at least
+$\underline{T}_{\mathrm{com}}-\sum\pi_j$ by validity of the committed bound; each
+free candidate contributes either $0$ (discarded) or
+$T_j-\pi_j\ge\underline{t}_j-\pi_j$ (included), hence at least
+$\min(0,\underline{t}_j-\pi_j)$; summation gives the claim. Crucially, the original
+free-part \emph{tardiness} bounds $LB_{\mathrm{par}}$ and $LB_{\mathrm{pos}}$ must
+\emph{not} be added for free candidates, because those parts are optional; only the
+optimistic term in \eqref{eq:bp_pricelb} is valid.
+
+\paragraph{(4) Dominance.} Adjacent-batch interchange dominance is unchanged on the
+committed portion, since the batch-time model \eqref{eq:bp_batchtime} and the
+completion-time structure are identical. Dominance and memoization keys must
+additionally fix the set of still-undecided free candidates, so that two states are
+compared only when they face the same remaining decisions; states with different
+discard sets are incomparable.
+
+\paragraph{(5) Termination and column harvesting.} Two modes are used.
+\emph{Heuristic pricing} stops at the first leaf with objective $<-\epsilon$, which
+already supplies a negative-reduced-cost column. \emph{Exact pricing} runs to
+completion to obtain the minimum, needed both to \emph{certify} that no negative
+column remains (master-LP optimality) and to supply the Lagrangian bound
+$z_{\mathrm{RMP}}+\Mbar\,\bar c^\star$. Several distinct negative-objective leaves
+may be harvested per call and added to the pool; pruning uses
+$\mathrm{LB}_{\mathrm{pc}}\ge\min(0,\text{pricer incumbent})$.
+
+\paragraph{(6) Master branching decisions.} The Ryan--Foster decisions of
+Section~\ref{sec:bp_branching} enter the pricer as local filters: \emph{together}
+treats the pair $(j,j')$ as a single composite candidate (included or discarded
+jointly); \emph{apart} forbids any leaf that contains both.
+
+This retrofit reuses the oracle's batching, completion-time, committed-tardiness
+and dominance machinery verbatim; the only new elements are the discard branch, the
+prize accumulation in the objective \textnormal{(2)}, and the optimistic prize term
+in the bound \eqref{eq:bp_pricelb}. It is therefore the smallest viable first
+implementation step toward the full branch-and-price.
+
+
+\begin{thebibliography}{9}
+\bibitem[Barnhart et al.(1998)]{barnhart1998}
+Barnhart, C., Johnson, E.L., Nemhauser, G.L., Savelsbergh, M.W.P., Vance, P.H.,
+1998. Branch-and-price: column generation for solving huge integer programs.
+Operations Research 46 (3), 316--329.
+\bibitem[Desaulniers et al.(2005)]{desaulniers2005}
+Desaulniers, G., Desrosiers, J., Solomon, M.M. (Eds.), 2005. Column Generation.
+Springer, New York.
+\bibitem[Desrosiers and L\"ubbecke(2005)]{desrosiers2005}
+Desrosiers, J., L\"ubbecke, M.E., 2005. A primer in column generation, in:
+Column Generation. Springer, pp.\ 1--32.
+\bibitem[Ryan and Foster(1981)]{ryan1981}
+Ryan, D.M., Foster, B.A., 1981. An integer programming approach to scheduling,
+in: Computer Scheduling of Public Transport. North-Holland, pp.\ 269--280.
+\bibitem[Nascimento et al.(2024)]{nascimento2024}
+Nascimento, P.J., Silva, C., Antunes, C.H., Moniz, S., 2024. Optimal
+decomposition approach for solving large nesting and scheduling problems of
+additive manufacturing systems. European Journal of Operational Research 317 (1),
+92--110.
+\end{thebibliography}
+
+\end{document}

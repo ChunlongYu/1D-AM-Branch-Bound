@@ -1,0 +1,374 @@
+# experiment: ht2_2-25_0.6_0.3_3  M=2
+# config: HEAVY=1 diving=depth LS=1 ; TL=3600s traceint=10s
+# date: 2026-06-30T00:21:29  wall=3600.2s
+# columns of TRACE lines: t(s) ub lb gap(%) nodes
+#======================================================================
+
+Machine Info:
+  ID: 1, Num: 1
+  Scanning speed: 0.030864
+  Recoater speed: 0.700000
+  Setup time: 2.000000
+  Size: 25.000000 x 25.000000 x 32.500000
+
+Parts Summary:
+  Part 0: 16.700000 x 16.700000 x 10.700000, Vol = 173.600000, Support = 13.600000
+  Part 1: 16.700000 x 16.700000 x 10.700000, Vol = 173.600000, Support = 13.600000
+  Part 2: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 3: 8.000000 x 8.000000 x 5.000000, Vol = 75.000000, Support = 5.700000
+  Part 4: 8.000000 x 3.000000 x 4.000000, Vol = 50.000000, Support = 9.000000
+  Part 5: 2.000000 x 3.000000 x 5.000000, Vol = 10.000000, Support = 4.000000
+  Part 6: 5.000000 x 2.000000 x 25.000000, Vol = 60.000000, Support = 20.000000
+  Part 7: 5.000000 x 2.000000 x 25.000000, Vol = 60.000000, Support = 20.000000
+  Part 8: 5.000000 x 5.000000 x 3.000000, Vol = 23.300000, Support = 3.200000
+  Part 9: 5.000000 x 5.500000 x 6.000000, Vol = 80.000000, Support = 5.000000
+  Part 10: 5.000000 x 4.000000 x 7.600000, Vol = 80.000000, Support = 18.000000
+  Part 11: 5.000000 x 4.000000 x 7.600000, Vol = 80.000000, Support = 18.000000
+  Part 12: 4.590000 x 7.300000 x 1.500000, Vol = 40.000000, Support = 0.000000
+  Part 13: 4.000000 x 4.000000 x 12.000000, Vol = 100.000000, Support = 35.000000
+  Part 14: 4.000000 x 4.000000 x 12.000000, Vol = 100.000000, Support = 35.000000
+  Part 15: 5.000000 x 5.000000 x 2.700000, Vol = 22.400000, Support = 8.200000
+  Part 16: 5.000000 x 5.000000 x 2.700000, Vol = 22.400000, Support = 8.200000
+  Part 17: 12.500000 x 12.500000 x 8.000000, Vol = 76.500000, Support = 5.800000
+  Part 18: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 19: 2.500000 x 1.500000 x 3.000000, Vol = 10.000000, Support = 5.000000
+  Part 20: 4.000000 x 7.000000 x 7.000000, Vol = 80.000000, Support = 10.000000
+  Part 21: 4.000000 x 7.000000 x 7.000000, Vol = 80.000000, Support = 10.000000
+  Part 22: 7.500000 x 7.500000 x 4.500000, Vol = 78.600000, Support = 10.800000
+  Part 23: 3.000000 x 5.000000 x 7.000000, Vol = 70.000000, Support = 12.000000
+  Part 24: 5.000000 x 4.000000 x 7.600000, Vol = 76.000000, Support = 20.300000
+
+Single-machine EDD initial Total Tardiness (info only): 1187.827949
+
+============== Parallel-Machine Branch and Bound ==============
+Number of machines M = 2
+
+TRACE t=193.1 ub=361.366 lb=24.6376 gap=93.18 nodes=0
+TRACE t=203.1 ub=361.366 lb=26.4894 gap=92.67 nodes=213
+TRACE t=213.1 ub=361.366 lb=26.4894 gap=92.67 nodes=449
+TRACE t=223.4 ub=361.366 lb=26.4894 gap=92.67 nodes=523
+TRACE t=233.5 ub=361.366 lb=26.4894 gap=92.67 nodes=833
+TRACE t=243.7 ub=361.366 lb=26.4894 gap=92.67 nodes=1091
+TRACE t=256.1 ub=361.366 lb=26.4894 gap=92.67 nodes=1287
+TRACE t=267.4 ub=361.366 lb=26.4894 gap=92.67 nodes=1465
+TRACE t=277.4 ub=361.366 lb=26.4894 gap=92.67 nodes=1571
+TRACE t=287.8 ub=361.366 lb=26.4894 gap=92.67 nodes=1721
+TRACE t=297.8 ub=361.366 lb=26.4894 gap=92.67 nodes=1797
+TRACE t=310.6 ub=361.366 lb=26.4894 gap=92.67 nodes=1911
+TRACE t=321.8 ub=361.366 lb=26.4894 gap=92.67 nodes=2005
+TRACE t=331.8 ub=361.366 lb=26.4894 gap=92.67 nodes=2117
+TRACE t=341.9 ub=361.366 lb=26.4894 gap=92.67 nodes=2325
+TRACE t=352.3 ub=361.366 lb=26.4894 gap=92.67 nodes=2499
+TRACE t=364.1 ub=361.366 lb=26.4894 gap=92.67 nodes=2561
+TRACE t=374.1 ub=361.366 lb=26.4894 gap=92.67 nodes=2765
+TRACE t=385.5 ub=361.366 lb=26.4894 gap=92.67 nodes=3049
+TRACE t=396.4 ub=361.366 lb=26.4894 gap=92.67 nodes=3201
+TRACE t=406.4 ub=361.366 lb=26.4894 gap=92.67 nodes=3419
+TRACE t=416.7 ub=361.366 lb=26.4894 gap=92.67 nodes=3579
+TRACE t=426.7 ub=361.366 lb=26.4894 gap=92.67 nodes=3817
+TRACE t=438.2 ub=361.366 lb=26.4894 gap=92.67 nodes=3951
+TRACE t=449.3 ub=361.366 lb=26.4894 gap=92.67 nodes=4023
+TRACE t=460.0 ub=361.366 lb=26.4894 gap=92.67 nodes=4053
+TRACE t=471.0 ub=361.366 lb=26.4894 gap=92.67 nodes=4261
+TRACE t=482.0 ub=361.366 lb=26.4894 gap=92.67 nodes=4479
+TRACE t=493.2 ub=361.366 lb=26.4894 gap=92.67 nodes=4593
+TRACE t=503.3 ub=361.366 lb=26.4894 gap=92.67 nodes=4699
+TRACE t=513.4 ub=361.366 lb=26.4894 gap=92.67 nodes=4939
+TRACE t=523.8 ub=361.366 lb=26.4894 gap=92.67 nodes=5157
+TRACE t=533.8 ub=361.366 lb=26.4894 gap=92.67 nodes=5353
+TRACE t=543.8 ub=361.366 lb=26.4894 gap=92.67 nodes=5523
+TRACE t=555.9 ub=361.366 lb=26.4894 gap=92.67 nodes=5615
+TRACE t=567.0 ub=361.366 lb=26.4894 gap=92.67 nodes=5809
+TRACE t=577.2 ub=361.366 lb=26.4894 gap=92.67 nodes=5899
+TRACE t=588.3 ub=361.366 lb=26.4894 gap=92.67 nodes=5999
+TRACE t=599.7 ub=361.366 lb=26.4894 gap=92.67 nodes=6063
+TRACE t=609.8 ub=361.366 lb=26.4894 gap=92.67 nodes=6165
+TRACE t=619.9 ub=361.366 lb=26.4894 gap=92.67 nodes=6413
+TRACE t=630.1 ub=361.366 lb=26.4894 gap=92.67 nodes=6631
+TRACE t=640.1 ub=361.366 lb=26.4894 gap=92.67 nodes=6859
+TRACE t=652.0 ub=361.366 lb=26.4894 gap=92.67 nodes=7143
+TRACE t=662.6 ub=361.366 lb=26.4894 gap=92.67 nodes=7157
+TRACE t=672.6 ub=361.366 lb=26.4894 gap=92.67 nodes=7389
+TRACE t=683.6 ub=361.366 lb=26.4894 gap=92.67 nodes=7655
+TRACE t=693.7 ub=361.366 lb=26.4894 gap=92.67 nodes=7767
+TRACE t=704.6 ub=361.366 lb=26.4894 gap=92.67 nodes=7915
+TRACE t=716.6 ub=361.366 lb=26.4894 gap=92.67 nodes=8093
+TRACE t=727.6 ub=361.366 lb=26.4894 gap=92.67 nodes=8121
+TRACE t=737.6 ub=361.366 lb=26.4894 gap=92.67 nodes=8417
+TRACE t=747.8 ub=361.366 lb=26.4894 gap=92.67 nodes=8563
+TRACE t=757.8 ub=361.366 lb=26.4894 gap=92.67 nodes=8723
+TRACE t=769.0 ub=361.366 lb=26.4894 gap=92.67 nodes=8945
+TRACE t=780.2 ub=361.366 lb=26.4894 gap=92.67 nodes=9169
+TRACE t=790.2 ub=361.366 lb=26.4894 gap=92.67 nodes=9325
+TRACE t=800.3 ub=361.366 lb=26.4894 gap=92.67 nodes=9587
+TRACE t=812.2 ub=361.366 lb=26.4894 gap=92.67 nodes=9671
+TRACE t=824.3 ub=361.366 lb=26.4894 gap=92.67 nodes=9911
+TRACE t=837.0 ub=361.366 lb=26.4894 gap=92.67 nodes=10039
+TRACE t=847.0 ub=361.366 lb=26.4894 gap=92.67 nodes=10107
+TRACE t=857.3 ub=361.366 lb=26.4894 gap=92.67 nodes=10219
+TRACE t=867.3 ub=361.366 lb=26.4894 gap=92.67 nodes=10421
+TRACE t=877.3 ub=361.366 lb=26.4894 gap=92.67 nodes=10605
+TRACE t=887.5 ub=361.366 lb=26.4894 gap=92.67 nodes=10743
+TRACE t=897.5 ub=361.366 lb=26.4894 gap=92.67 nodes=10939
+TRACE t=908.8 ub=361.366 lb=26.4894 gap=92.67 nodes=11131
+TRACE t=918.8 ub=361.366 lb=26.4894 gap=92.67 nodes=11227
+TRACE t=928.9 ub=361.366 lb=26.4894 gap=92.67 nodes=11413
+TRACE t=939.0 ub=361.366 lb=26.4894 gap=92.67 nodes=11605
+TRACE t=949.7 ub=361.366 lb=26.4894 gap=92.67 nodes=11691
+TRACE t=959.7 ub=361.366 lb=26.4894 gap=92.67 nodes=11885
+TRACE t=971.2 ub=361.366 lb=26.4894 gap=92.67 nodes=11955
+TRACE t=981.3 ub=361.366 lb=26.4894 gap=92.67 nodes=12073
+TRACE t=991.9 ub=361.366 lb=26.4894 gap=92.67 nodes=12137
+TRACE t=1001.9 ub=361.366 lb=26.4894 gap=92.67 nodes=12365
+TRACE t=1011.9 ub=361.366 lb=26.4894 gap=92.67 nodes=12555
+TRACE t=1024.0 ub=361.366 lb=26.4894 gap=92.67 nodes=12729
+TRACE t=1034.0 ub=361.366 lb=26.4894 gap=92.67 nodes=12917
+TRACE t=1044.1 ub=361.366 lb=26.4894 gap=92.67 nodes=13115
+TRACE t=1054.2 ub=361.366 lb=26.4894 gap=92.67 nodes=13225
+TRACE t=1064.4 ub=361.366 lb=26.4894 gap=92.67 nodes=13371
+TRACE t=1074.4 ub=361.366 lb=26.4894 gap=92.67 nodes=13565
+TRACE t=1084.6 ub=361.366 lb=26.4894 gap=92.67 nodes=13723
+TRACE t=1094.8 ub=361.366 lb=26.4894 gap=92.67 nodes=13831
+TRACE t=1106.3 ub=361.366 lb=26.4894 gap=92.67 nodes=13989
+TRACE t=1116.3 ub=361.366 lb=26.4894 gap=92.67 nodes=14093
+TRACE t=1128.6 ub=361.366 lb=26.4894 gap=92.67 nodes=14171
+TRACE t=1138.6 ub=361.366 lb=26.4894 gap=92.67 nodes=14351
+TRACE t=1148.6 ub=361.366 lb=26.4894 gap=92.67 nodes=14543
+TRACE t=1159.8 ub=361.366 lb=26.4894 gap=92.67 nodes=14745
+TRACE t=1169.8 ub=361.366 lb=26.4894 gap=92.67 nodes=14841
+TRACE t=1180.0 ub=361.366 lb=26.4894 gap=92.67 nodes=15011
+TRACE t=1190.1 ub=361.366 lb=26.4894 gap=92.67 nodes=15139
+TRACE t=1201.5 ub=361.366 lb=26.4894 gap=92.67 nodes=15207
+TRACE t=1211.6 ub=361.366 lb=26.4894 gap=92.67 nodes=15365
+TRACE t=1222.9 ub=361.366 lb=26.4894 gap=92.67 nodes=15527
+TRACE t=1233.2 ub=361.366 lb=26.4894 gap=92.67 nodes=15655
+TRACE t=1244.6 ub=361.366 lb=26.4894 gap=92.67 nodes=15721
+TRACE t=1255.9 ub=361.366 lb=26.4894 gap=92.67 nodes=15911
+TRACE t=1265.9 ub=361.366 lb=26.4894 gap=92.67 nodes=15975
+TRACE t=1276.0 ub=361.366 lb=26.4894 gap=92.67 nodes=16089
+TRACE t=1286.3 ub=361.366 lb=26.4894 gap=92.67 nodes=16193
+TRACE t=1296.6 ub=361.366 lb=26.4894 gap=92.67 nodes=16431
+TRACE t=1307.0 ub=361.366 lb=26.4894 gap=92.67 nodes=16649
+TRACE t=1317.6 ub=361.366 lb=26.4894 gap=92.67 nodes=16807
+TRACE t=1329.4 ub=361.366 lb=26.4894 gap=92.67 nodes=16957
+TRACE t=1339.4 ub=361.366 lb=26.4894 gap=92.67 nodes=17101
+TRACE t=1349.8 ub=361.366 lb=26.4894 gap=92.67 nodes=17273
+TRACE t=1359.8 ub=361.366 lb=26.4894 gap=92.67 nodes=17435
+TRACE t=1370.0 ub=361.366 lb=26.4894 gap=92.67 nodes=17625
+TRACE t=1390.4 ub=361.366 lb=26.4894 gap=92.67 nodes=17845
+TRACE t=1400.5 ub=361.366 lb=26.4894 gap=92.67 nodes=18065
+TRACE t=1410.9 ub=361.366 lb=26.4894 gap=92.67 nodes=18241
+TRACE t=1423.0 ub=361.366 lb=26.4894 gap=92.67 nodes=18311
+TRACE t=1438.1 ub=361.366 lb=26.4894 gap=92.67 nodes=18335
+TRACE t=1454.0 ub=361.366 lb=26.4894 gap=92.67 nodes=18341
+TRACE t=1469.9 ub=361.366 lb=26.4894 gap=92.67 nodes=18353
+TRACE t=1480.3 ub=361.366 lb=26.4894 gap=92.67 nodes=18503
+TRACE t=1490.5 ub=361.366 lb=26.4894 gap=92.67 nodes=18665
+TRACE t=1500.9 ub=361.366 lb=26.4894 gap=92.67 nodes=18837
+TRACE t=1511.1 ub=361.366 lb=26.4894 gap=92.67 nodes=18929
+TRACE t=1521.3 ub=361.366 lb=26.4894 gap=92.67 nodes=19073
+TRACE t=1531.8 ub=361.366 lb=26.4894 gap=92.67 nodes=19207
+TRACE t=1542.2 ub=361.366 lb=26.4894 gap=92.67 nodes=19433
+TRACE t=1552.9 ub=361.366 lb=26.4894 gap=92.67 nodes=19661
+TRACE t=1564.1 ub=361.366 lb=26.4894 gap=92.67 nodes=19855
+TRACE t=1574.2 ub=361.366 lb=26.4894 gap=92.67 nodes=20011
+TRACE t=1586.7 ub=361.366 lb=26.4894 gap=92.67 nodes=20215
+TRACE t=1597.3 ub=361.366 lb=26.4894 gap=92.67 nodes=20301
+TRACE t=1607.4 ub=361.366 lb=26.4894 gap=92.67 nodes=20459
+TRACE t=1617.5 ub=361.366 lb=26.4894 gap=92.67 nodes=20639
+TRACE t=1627.7 ub=361.366 lb=26.4894 gap=92.67 nodes=20797
+TRACE t=1638.0 ub=361.366 lb=26.4894 gap=92.67 nodes=20897
+TRACE t=1648.0 ub=361.366 lb=26.4894 gap=92.67 nodes=21097
+TRACE t=1658.1 ub=361.366 lb=26.4894 gap=92.67 nodes=21357
+TRACE t=1668.2 ub=361.366 lb=26.4894 gap=92.67 nodes=21645
+TRACE t=1678.3 ub=361.366 lb=26.4894 gap=92.67 nodes=21803
+TRACE t=1688.3 ub=361.366 lb=26.4894 gap=92.67 nodes=21923
+TRACE t=1698.5 ub=361.366 lb=26.4894 gap=92.67 nodes=22065
+TRACE t=1708.7 ub=361.366 lb=26.4894 gap=92.67 nodes=22179
+TRACE t=1718.7 ub=361.366 lb=26.4894 gap=92.67 nodes=22273
+TRACE t=1729.4 ub=361.366 lb=26.4894 gap=92.67 nodes=22337
+TRACE t=1742.5 ub=361.366 lb=26.4894 gap=92.67 nodes=22365
+TRACE t=1752.5 ub=361.366 lb=26.4894 gap=92.67 nodes=22375
+TRACE t=1762.8 ub=361.366 lb=26.4894 gap=92.67 nodes=22661
+TRACE t=1773.1 ub=361.366 lb=26.4894 gap=92.67 nodes=22843
+TRACE t=1784.5 ub=361.366 lb=26.4894 gap=92.67 nodes=23087
+TRACE t=1795.3 ub=361.366 lb=26.4894 gap=92.67 nodes=23241
+TRACE t=1805.3 ub=361.366 lb=26.4894 gap=92.67 nodes=23549
+TRACE t=1818.6 ub=361.366 lb=26.4894 gap=92.67 nodes=23649
+TRACE t=1832.0 ub=361.366 lb=26.4894 gap=92.67 nodes=23785
+TRACE t=1842.2 ub=361.366 lb=26.4894 gap=92.67 nodes=23871
+TRACE t=1853.0 ub=361.366 lb=26.4894 gap=92.67 nodes=24033
+TRACE t=1864.3 ub=361.366 lb=26.4894 gap=92.67 nodes=24097
+TRACE t=1874.4 ub=361.366 lb=26.4894 gap=92.67 nodes=24137
+TRACE t=1886.2 ub=361.366 lb=26.4894 gap=92.67 nodes=24225
+TRACE t=1900.1 ub=361.366 lb=26.4894 gap=92.67 nodes=24293
+TRACE t=1910.3 ub=361.366 lb=26.4894 gap=92.67 nodes=24451
+TRACE t=1920.4 ub=361.366 lb=26.4894 gap=92.67 nodes=24621
+TRACE t=1930.5 ub=361.366 lb=26.4894 gap=92.67 nodes=24837
+TRACE t=1940.7 ub=361.366 lb=26.4894 gap=92.67 nodes=24969
+TRACE t=1950.9 ub=361.366 lb=26.4894 gap=92.67 nodes=25093
+TRACE t=1960.9 ub=361.366 lb=26.4894 gap=92.67 nodes=25243
+TRACE t=1970.9 ub=361.366 lb=26.4894 gap=92.67 nodes=25409
+TRACE t=1981.3 ub=361.366 lb=26.4894 gap=92.67 nodes=25563
+TRACE t=1991.4 ub=361.366 lb=26.4894 gap=92.67 nodes=25759
+TRACE t=2011.2 ub=361.366 lb=26.4894 gap=92.67 nodes=25963
+TRACE t=2021.2 ub=361.366 lb=26.4894 gap=92.67 nodes=26197
+TRACE t=2031.5 ub=361.366 lb=26.4894 gap=92.67 nodes=26359
+TRACE t=2043.6 ub=361.366 lb=26.4894 gap=92.67 nodes=26429
+TRACE t=2058.6 ub=361.366 lb=26.4894 gap=92.67 nodes=26457
+TRACE t=2074.1 ub=361.366 lb=26.4894 gap=92.67 nodes=26467
+TRACE t=2084.1 ub=361.366 lb=26.4894 gap=92.67 nodes=26523
+TRACE t=2094.1 ub=361.366 lb=26.4894 gap=92.67 nodes=26727
+TRACE t=2105.3 ub=361.366 lb=26.4894 gap=92.67 nodes=26911
+TRACE t=2116.2 ub=361.366 lb=26.4894 gap=92.67 nodes=27025
+TRACE t=2126.4 ub=361.366 lb=26.4894 gap=92.67 nodes=27181
+TRACE t=2136.9 ub=361.366 lb=26.4894 gap=92.67 nodes=27295
+TRACE t=2150.2 ub=361.366 lb=26.4894 gap=92.67 nodes=27405
+TRACE t=2162.3 ub=361.366 lb=26.4894 gap=92.67 nodes=27481
+TRACE t=2172.3 ub=361.366 lb=26.4894 gap=92.67 nodes=27685
+TRACE t=2182.4 ub=361.366 lb=26.4894 gap=92.67 nodes=27741
+TRACE t=2195.9 ub=361.366 lb=26.4894 gap=92.67 nodes=27869
+TRACE t=2206.1 ub=361.366 lb=26.4894 gap=92.67 nodes=27963
+TRACE t=2218.2 ub=361.366 lb=26.4894 gap=92.67 nodes=28109
+TRACE t=2230.1 ub=361.366 lb=26.4894 gap=92.67 nodes=28189
+TRACE t=2241.6 ub=361.366 lb=26.4894 gap=92.67 nodes=28233
+TRACE t=2251.6 ub=361.366 lb=26.4894 gap=92.67 nodes=28301
+TRACE t=2262.9 ub=361.366 lb=26.4894 gap=92.67 nodes=28361
+TRACE t=2273.7 ub=361.366 lb=26.4894 gap=92.67 nodes=28411
+TRACE t=2283.8 ub=361.366 lb=26.4894 gap=92.67 nodes=28585
+TRACE t=2293.9 ub=361.366 lb=26.4894 gap=92.67 nodes=28795
+TRACE t=2304.7 ub=361.366 lb=26.4894 gap=92.67 nodes=28959
+TRACE t=2314.7 ub=361.366 lb=26.4894 gap=92.67 nodes=29029
+TRACE t=2324.9 ub=361.366 lb=26.4894 gap=92.67 nodes=29215
+TRACE t=2335.6 ub=361.366 lb=26.4894 gap=92.67 nodes=29355
+TRACE t=2346.2 ub=361.366 lb=26.4894 gap=92.67 nodes=29495
+TRACE t=2356.3 ub=361.366 lb=26.4894 gap=92.67 nodes=29593
+TRACE t=2366.8 ub=361.366 lb=26.4894 gap=92.67 nodes=29739
+TRACE t=2377.8 ub=361.366 lb=26.4894 gap=92.67 nodes=29863
+TRACE t=2388.7 ub=361.366 lb=26.4894 gap=92.67 nodes=29981
+TRACE t=2399.8 ub=361.366 lb=26.4894 gap=92.67 nodes=30167
+TRACE t=2411.8 ub=361.366 lb=26.4894 gap=92.67 nodes=30245
+TRACE t=2422.1 ub=361.366 lb=26.4894 gap=92.67 nodes=30405
+TRACE t=2432.5 ub=361.366 lb=26.4894 gap=92.67 nodes=30515
+TRACE t=2442.5 ub=361.366 lb=26.4894 gap=92.67 nodes=30871
+TRACE t=2452.8 ub=361.366 lb=26.4894 gap=92.67 nodes=31051
+TRACE t=2462.8 ub=361.366 lb=26.4894 gap=92.67 nodes=31159
+TRACE t=2478.9 ub=361.366 lb=26.4894 gap=92.67 nodes=31331
+TRACE t=2494.7 ub=361.366 lb=26.4894 gap=92.67 nodes=31435
+TRACE t=2509.3 ub=361.366 lb=26.4894 gap=92.67 nodes=31465
+TRACE t=2527.0 ub=361.366 lb=26.4894 gap=92.67 nodes=31559
+TRACE t=2539.2 ub=361.366 lb=26.4894 gap=92.67 nodes=31813
+TRACE t=2549.7 ub=361.366 lb=26.4894 gap=92.67 nodes=31947
+TRACE t=2565.1 ub=361.366 lb=26.4894 gap=92.67 nodes=31977
+TRACE t=2578.5 ub=361.366 lb=26.4894 gap=92.67 nodes=32067
+TRACE t=2594.7 ub=361.366 lb=26.4894 gap=92.67 nodes=32231
+TRACE t=2606.1 ub=361.366 lb=26.4894 gap=92.67 nodes=32265
+TRACE t=2621.9 ub=361.366 lb=26.4894 gap=92.67 nodes=32395
+TRACE t=2638.3 ub=361.366 lb=26.4894 gap=92.67 nodes=32457
+TRACE t=2648.4 ub=361.366 lb=26.4894 gap=92.67 nodes=32835
+TRACE t=2658.6 ub=361.366 lb=26.4894 gap=92.67 nodes=32963
+TRACE t=2672.5 ub=361.366 lb=26.4894 gap=92.67 nodes=33105
+TRACE t=2682.5 ub=361.366 lb=26.4894 gap=92.67 nodes=33303
+TRACE t=2692.7 ub=361.366 lb=26.4894 gap=92.67 nodes=33463
+TRACE t=2704.2 ub=361.366 lb=26.4894 gap=92.67 nodes=33579
+TRACE t=2716.7 ub=361.366 lb=26.4894 gap=92.67 nodes=33773
+TRACE t=2726.7 ub=361.366 lb=26.4894 gap=92.67 nodes=34089
+TRACE t=2736.8 ub=361.366 lb=26.4894 gap=92.67 nodes=34393
+TRACE t=2747.1 ub=361.366 lb=26.4894 gap=92.67 nodes=34585
+TRACE t=2757.1 ub=361.366 lb=26.4894 gap=92.67 nodes=34703
+TRACE t=2767.5 ub=361.366 lb=26.4894 gap=92.67 nodes=34865
+TRACE t=2777.9 ub=361.366 lb=26.4894 gap=92.67 nodes=35075
+TRACE t=2788.1 ub=361.366 lb=26.4894 gap=92.67 nodes=35241
+TRACE t=2800.0 ub=361.366 lb=26.4894 gap=92.67 nodes=35499
+TRACE t=2812.2 ub=361.366 lb=26.4894 gap=92.67 nodes=35683
+TRACE t=2822.3 ub=361.366 lb=26.4894 gap=92.67 nodes=35851
+TRACE t=2832.3 ub=361.366 lb=26.4894 gap=92.67 nodes=36151
+TRACE t=2844.4 ub=361.366 lb=26.4894 gap=92.67 nodes=36277
+TRACE t=2857.3 ub=361.366 lb=26.4894 gap=92.67 nodes=36469
+TRACE t=2873.8 ub=361.366 lb=26.4894 gap=92.67 nodes=36811
+TRACE t=2884.6 ub=361.366 lb=26.4894 gap=92.67 nodes=37007
+TRACE t=2894.9 ub=361.366 lb=26.4894 gap=92.67 nodes=37087
+TRACE t=2907.7 ub=361.366 lb=26.4894 gap=92.67 nodes=37283
+TRACE t=2917.9 ub=361.366 lb=26.4894 gap=92.67 nodes=37429
+TRACE t=2934.3 ub=361.366 lb=26.4894 gap=92.67 nodes=37515
+TRACE t=2944.3 ub=361.366 lb=26.4894 gap=92.67 nodes=38013
+TRACE t=2958.2 ub=361.366 lb=26.4894 gap=92.67 nodes=38501
+TRACE t=2971.0 ub=361.366 lb=26.4894 gap=92.67 nodes=39055
+TRACE t=2985.5 ub=361.366 lb=26.4894 gap=92.67 nodes=39451
+TRACE t=2995.5 ub=361.366 lb=26.4894 gap=92.67 nodes=39525
+TRACE t=3005.6 ub=361.366 lb=26.4894 gap=92.67 nodes=39787
+TRACE t=3017.6 ub=361.366 lb=26.4894 gap=92.67 nodes=39849
+TRACE t=3027.8 ub=361.366 lb=26.4894 gap=92.67 nodes=40077
+TRACE t=3041.5 ub=361.366 lb=26.4894 gap=92.67 nodes=40257
+TRACE t=3052.4 ub=361.366 lb=26.4894 gap=92.67 nodes=40375
+TRACE t=3063.7 ub=361.366 lb=26.4894 gap=92.67 nodes=40621
+TRACE t=3074.7 ub=361.366 lb=26.4894 gap=92.67 nodes=40763
+TRACE t=3085.0 ub=361.366 lb=26.4894 gap=92.67 nodes=40857
+TRACE t=3095.1 ub=361.366 lb=26.4894 gap=92.67 nodes=41181
+TRACE t=3105.4 ub=361.366 lb=26.4894 gap=92.67 nodes=41365
+TRACE t=3116.4 ub=361.366 lb=26.4894 gap=92.67 nodes=41633
+TRACE t=3127.8 ub=361.366 lb=26.4894 gap=92.67 nodes=41773
+TRACE t=3138.3 ub=361.366 lb=26.4894 gap=92.67 nodes=41879
+TRACE t=3148.3 ub=361.366 lb=26.4894 gap=92.67 nodes=42085
+TRACE t=3161.4 ub=361.366 lb=26.4894 gap=92.67 nodes=42319
+TRACE t=3171.6 ub=361.366 lb=26.4894 gap=92.67 nodes=42477
+TRACE t=3184.4 ub=361.366 lb=26.4894 gap=92.67 nodes=42745
+TRACE t=3195.9 ub=361.366 lb=26.4894 gap=92.67 nodes=42929
+TRACE t=3206.2 ub=361.366 lb=26.4894 gap=92.67 nodes=43123
+TRACE t=3218.5 ub=361.366 lb=26.4894 gap=92.67 nodes=43427
+TRACE t=3228.5 ub=361.366 lb=26.4894 gap=92.67 nodes=43583
+TRACE t=3240.0 ub=361.366 lb=26.4894 gap=92.67 nodes=43715
+TRACE t=3250.1 ub=361.366 lb=26.4894 gap=92.67 nodes=43979
+TRACE t=3260.3 ub=361.366 lb=26.4894 gap=92.67 nodes=44249
+TRACE t=3270.4 ub=361.366 lb=26.4894 gap=92.67 nodes=44509
+TRACE t=3280.4 ub=361.366 lb=26.4894 gap=92.67 nodes=44737
+TRACE t=3290.6 ub=361.366 lb=26.4894 gap=92.67 nodes=45005
+TRACE t=3300.8 ub=361.366 lb=26.4894 gap=92.67 nodes=45245
+TRACE t=3311.0 ub=361.366 lb=26.4894 gap=92.67 nodes=45475
+TRACE t=3322.8 ub=361.366 lb=26.4894 gap=92.67 nodes=45633
+TRACE t=3332.8 ub=361.366 lb=26.4894 gap=92.67 nodes=45777
+TRACE t=3342.8 ub=361.366 lb=26.4894 gap=92.67 nodes=46049
+TRACE t=3352.9 ub=361.366 lb=26.4894 gap=92.67 nodes=46285
+TRACE t=3363.0 ub=361.366 lb=26.4894 gap=92.67 nodes=46537
+TRACE t=3373.0 ub=361.366 lb=26.4894 gap=92.67 nodes=46639
+TRACE t=3383.2 ub=361.366 lb=26.4894 gap=92.67 nodes=46799
+TRACE t=3393.2 ub=361.366 lb=26.4894 gap=92.67 nodes=47047
+TRACE t=3403.9 ub=361.366 lb=26.4894 gap=92.67 nodes=47187
+TRACE t=3413.9 ub=361.366 lb=26.4894 gap=92.67 nodes=47395
+TRACE t=3425.4 ub=361.366 lb=26.4894 gap=92.67 nodes=47437
+TRACE t=3436.7 ub=361.366 lb=26.4894 gap=92.67 nodes=47563
+TRACE t=3447.4 ub=361.366 lb=26.4894 gap=92.67 nodes=47623
+TRACE t=3458.9 ub=361.366 lb=26.4894 gap=92.67 nodes=47665
+TRACE t=3471.1 ub=361.366 lb=26.4894 gap=92.67 nodes=47867
+TRACE t=3481.1 ub=361.366 lb=26.4894 gap=92.67 nodes=48071
+TRACE t=3491.2 ub=361.366 lb=26.4894 gap=92.67 nodes=48283
+TRACE t=3501.9 ub=361.366 lb=26.4894 gap=92.67 nodes=48423
+TRACE t=3512.8 ub=361.366 lb=26.4894 gap=92.67 nodes=48549
+TRACE t=3523.7 ub=361.366 lb=26.4894 gap=92.67 nodes=48661
+TRACE t=3534.5 ub=361.366 lb=26.4894 gap=92.67 nodes=48723
+TRACE t=3544.5 ub=361.366 lb=26.4894 gap=92.67 nodes=48809
+TRACE t=3556.8 ub=361.366 lb=26.4894 gap=92.67 nodes=49501
+TRACE t=3567.8 ub=361.366 lb=26.4894 gap=92.67 nodes=49859
+TRACE t=3579.4 ub=361.366 lb=26.4894 gap=92.67 nodes=50093
+TRACE t=3589.5 ub=361.366 lb=26.4894 gap=92.67 nodes=50383
+
+=============== Best Parallel Assignment ===============
+  Machine 0 : [6, 7, 9, 10, 11, 13, 14, 21, 23, 24]  -> Phi = 196.724800
+  Machine 1 : [0, 1, 2, 3, 4, 5, 8, 12, 15, 16, 17, 18, 19, 20, 22]  -> Phi = 164.640704
+
+Total Tardiness (UB): 361.365504
+Proven optimal: no (time limit reached)
+
+============= Parallel Search Info =============
+nodes processed:      47583
+nodes generated:      50553
+leaf nodes evaluated: 22306
+incumbent updates:    0
+LB-pruned nodes:      2958
+oracle calls:         24855
+oracle cache hits:    122
+time:3600.138000s
+RESULT instance=..\..\Instances\Derived_Yu2022_small\ht2_2-25_0.6_0.3_3.txt n=25 M=2 TT=361.366 optimal=0 time=3600.13 lb=26.4894 gap=92.6696 nodes=47583 oracle=24855
+
+[stderr]
+[heavy] K=15 cap=625 calls=2021 prunes=0
